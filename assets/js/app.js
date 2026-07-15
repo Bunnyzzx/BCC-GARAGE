@@ -248,7 +248,9 @@
       .map(
         (m) =>
           '<a class="card model-card" href="#/veiculo/' + brandId + "/" + m.id + '">' +
-          '<div class="model-art">' + carSVG(m.hue, { glow: false }) + "</div>" +
+          '<div class="model-art">' + carSVG(m.hue, { glow: false }) +
+          '<img class="model-photo" src="' + TS.imgFor(brandId, m) + '" alt="' + esc(m.name) + '" loading="lazy" onerror="this.remove()"/>' +
+          "</div>" +
           '<div class="model-body"><h3>' + m.name + "</h3>" +
           '<div class="year">' + m.year + "</div>" +
           '<div class="model-specs">' +
@@ -294,7 +296,9 @@
       "</div>" +
       '<div class="fipe-chip"><span>Preço médio FIPE</span><b>' + vehicle.fipe + "</b></div>" +
       "</div>" +
-      '<div class="vehicle-art">' + carSVG(vehicle.hue) + "</div>" +
+      '<div class="vehicle-art">' + carSVG(vehicle.hue) +
+      '<img class="vehicle-photo" src="' + TS.imgFor(brandId, vehicle) + '" alt="' + esc(vehicle.name) + '" onerror="this.remove()"/>' +
+      "</div>" +
       '<div class="spec-strip">' +
       "<div><b>" + vehicle.engine + "</b><span>Motor</span></div>" +
       "<div><b>" + vehicle.power + "</b><span>Potência</span></div>" +

@@ -360,6 +360,15 @@ TS.getSeedPosts = function (vehicle) {
 };
 
 /* ---------- Helpers ---------- */
+/* Foto real do veículo: assets/img/vehicles/<marca>-<modelo>.jpg
+   (quando o arquivo não existe, a UI cai na silhueta SVG).
+   window.TS_IMG_DATA permite embutir imagens como data URI (preview). */
+TS.imgFor = function (brandId, model) {
+  const key = brandId + "-" + model.id;
+  if (window.TS_IMG_DATA && window.TS_IMG_DATA[key]) return window.TS_IMG_DATA[key];
+  return "assets/img/vehicles/" + key + ".jpg";
+};
+
 TS.getBrand = (id) => TS.brands.find((b) => b.id === id);
 TS.getVehicle = (brandId, modelId) => (TS.models[brandId] || []).find((m) => m.id === modelId);
 TS.getPro = (id) => TS.professionals.find((p) => p.id === id);
