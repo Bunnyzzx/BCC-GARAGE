@@ -56,7 +56,7 @@ assets/js/app.js      roteador + views + interações
 
 ### Fotos reais dos veículos
 
-A UI procura a foto de cada veículo em `assets/img/vehicles/<marca>-<modelo>.jpg` (ex.: `mitsubishi-lancer-gt.jpg`, 900px de largura, paisagem). Quando o arquivo não existe, ela usa a silhueta SVG automaticamente — basta adicionar as fotos que elas aparecem no catálogo e na página do veículo.
+A UI procura a foto de cada veículo em `assets/img/vehicles/<marca>-<modelo>.jpg` (ex.: `mitsubishi-lancer-gt.jpg`, 960px de largura, paisagem). Quando o arquivo não existe, ela usa a silhueta SVG automaticamente — basta adicionar as fotos que elas aparecem no catálogo e na página do veículo.
 
 O script `scripts/fetch_images.py` busca e baixa fotos livremente licenciadas do Wikimedia Commons para todos os modelos (requer rede liberada para `commons.wikimedia.org` e `upload.wikimedia.org`) e registra os créditos/licenças em `assets/img/credits.json`:
 
