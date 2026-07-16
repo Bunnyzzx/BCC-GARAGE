@@ -402,6 +402,12 @@ TS.parts = {
       compat: "Lancer 2.0 2011–2019",
       link: "https://www.mercadolivre.com.br/prokit-molas-eibach-mitsubishi-lancer-20-de-2011-ate-2019/up/MLBU1165107367?pdp_filters=item_id%3AMLB4623396732&matt_tool=38524122&ua=RWK_G4CDHxju0CGl_UtqfwJRTqMZ3FDWGfqXNtbQMrh_k6sb#origin=share&sid=share&wid=MLB4623396732&action=copy",
     },
+    {
+      icon: "ecu", name: "Tomada carregador veicular USB fixa",
+      desc: "Tomada USB de embutir 12V/24V 3A para carregar dispositivos no carro.",
+      compat: "Universal 12V/24V",
+      link: "https://www.mercadolivre.com.br/tomada-carregador-veicular-usb-van-caminho-barco-12v-24v-3a/p/MLB20681165#reviews",
+    },
   ],
 };
 
