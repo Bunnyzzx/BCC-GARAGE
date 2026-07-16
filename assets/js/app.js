@@ -48,6 +48,12 @@
     globe:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 5.7 4 9s-1.5 6.4-4 9c-2.5-2.6-4-5.7-4-9s1.5-6.4 4-9z"/></svg>',
   };
 
+  /* Imagem do hero (cutaway técnico); se o arquivo não existir, a UI cai no carSVG. */
+  function heroImg() {
+    if (window.TS_IMG_DATA && window.TS_IMG_DATA["hero-cutaway"]) return window.TS_IMG_DATA["hero-cutaway"];
+    return "assets/img/hero-cutaway.jpg";
+  }
+
   /* ---------- Silhueta de carro (SVG) ---------- */
   function carSVG(hue, opts) {
     const o = opts || {};
@@ -182,7 +188,9 @@
       "<p>Encontre modificações, projetos, peças compatíveis e profissionais recomendados para o seu veículo.</p>" +
       '<a class="btn btn-red" href="#/marcas">Selecionar meu carro ' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
-      '<div class="hero-car">' + carSVG(355) + "</div>" +
+      '<div class="hero-car">' +
+      '<img class="hero-cutaway" src="' + heroImg() + '" alt="Cutaway técnico de um carro preparado com upgrades anotados" onerror="this.parentElement.classList.add(\'no-photo\');this.remove()"/>' +
+      carSVG(355) + "</div>" +
       '<div class="hero-stats">' +
       '<div class="hero-stat"><b>10</b><span>marcas</span></div>' +
       '<div class="hero-stat"><b>50+</b><span>modelos mapeados</span></div>' +
