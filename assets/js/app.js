@@ -134,17 +134,37 @@
     setTimeout(() => t.remove(), 2400);
   }
 
+  /* ---------- Catálogo visível no MVP ----------
+     Os dados completos (todas as marcas/modelos) continuam em data.js
+     e as fotos em assets/img/vehicles/ — aqui só se define o que a UI mostra. */
+  const ENABLED = { mitsubishi: ["lancer-gt"] };
+
+  function isEnabled(brandId, modelId) {
+    return (ENABLED[brandId] || []).includes(modelId);
+  }
+  function enabledVehicles() {
+    const out = [];
+    for (const brandId of Object.keys(ENABLED)) {
+      for (const m of TS.models[brandId] || []) {
+        if (isEnabled(brandId, m.id)) out.push({ brandId, m });
+      }
+    }
+    return out;
+  }
+  function mainVehicleHash() {
+    const v = enabledVehicles()[0];
+    return v ? "#/veiculo/" + v.brandId + "/" + v.m.id : "#/marcas";
+  }
+
   function navbar(active) {
     return (
       '<header class="nav"><div class="container nav-inner">' +
       '<a class="logo" href="#/"><span class="logo-mark">TS</span>Tune<span>Spec</span></a>' +
       '<nav class="nav-links">' +
       '<a href="#/" class="' + (active === "home" ? "active" : "") + '">Início</a>' +
-      '<a href="#/marcas" class="' + (active === "marcas" ? "active" : "") + '">Marcas</a>' +
-      '<a href="#/marcas">Projetos</a>' +
-      '<a href="#/marcas">Comunidade</a>' +
+      '<a href="#/marcas" class="' + (active === "marcas" ? "active" : "") + '">Modelos</a>' +
       '</nav>' +
-      '<button class="nav-cta" onclick="location.hash=\'#/marcas\'">Selecionar meu carro</button>' +
+      '<button class="nav-cta" onclick="location.hash=\'' + mainVehicleHash() + '\'">Ver meu carro</button>' +
       "</div></header>"
     );
   }
@@ -156,8 +176,8 @@
       "<div><a class='logo' href='#/'><span class='logo-mark'>TS</span>Tune<span>Spec</span></a>" +
       "<p>A plataforma definitiva para quem quer entender, modificar e evoluir o próprio carro — com informação confiável, peças compatíveis e profissionais recomendados.</p></div>" +
       "<div class='footer-links'>" +
-      "<div><h5>Plataforma</h5><a href='#/marcas'>Marcas</a><a href='#/marcas'>Modelos</a><a href='#/marcas'>Upgrades</a></div>" +
-      "<div><h5>Comunidade</h5><a href='#/marcas'>Posts</a><a href='#/marcas'>Projetos</a><a href='#/marcas'>Profissionais</a></div>" +
+      "<div><h5>Plataforma</h5><a href='#/marcas'>Modelos</a><a href='#/marcas'>Upgrades</a></div>" +
+      "<div><h5>Comunidade</h5><a href='#/marcas'>Posts</a><a href='#/marcas'>Profissionais</a></div>" +
       "<div><h5>Empresa</h5><a href='#/'>Sobre</a><a href='#/'>Contato</a><a href='#/'>Termos</a></div>" +
       "</div></div>" +
       "<div class='footer-bottom'><span>© 2026 TuneSpec. Todos os direitos reservados.</span><span>Feito para entusiastas.</span></div>" +
@@ -168,14 +188,25 @@
   /* =========================================================
      HOME
      ========================================================= */
+  function modelCard(brandId, m) {
+    return (
+      '<a class="card model-card" href="#/veiculo/' + brandId + "/" + m.id + '">' +
+      '<div class="model-art">' + carSVG(m.hue, { glow: false }) +
+      '<img class="model-photo" src="' + TS.imgFor(brandId, m) + '" alt="' + esc(m.name) + '" loading="lazy" onerror="this.remove()"/>' +
+      "</div>" +
+      '<div class="model-body"><h3>' + m.name + "</h3>" +
+      '<div class="year">' + m.year + "</div>" +
+      '<div class="model-specs">' +
+      "<div><b>" + m.power + "</b><span>Potência</span></div>" +
+      "<div><b>" + m.accel + "</b><span>0–100</span></div>" +
+      "<div><b>" + m.engine.split(" ")[0] + "</b><span>Motor</span></div>" +
+      "</div></div></a>"
+    );
+  }
+
   function renderHome() {
-    const brands = TS.brands
-      .map(
-        (b) =>
-          '<a class="card brand-card" href="#/marca/' + b.id + '">' +
-          '<span class="brand-mono">' + b.mono + "</span>" +
-          "<b>" + b.name + "</b><span>" + b.country + "</span></a>"
-      )
+    const models = enabledVehicles()
+      .map(({ brandId, m }) => modelCard(brandId, m))
       .join("");
 
     app.innerHTML =
@@ -186,23 +217,21 @@
       '<div class="hero-eyebrow"><span class="dot"></span>Catálogo inteligente · Preparação · Comunidade</div>' +
       "<h1>Tudo o que seu carro <em>pode se tornar.</em></h1>" +
       "<p>Encontre modificações, projetos, peças compatíveis e profissionais recomendados para o seu veículo.</p>" +
-      '<a class="btn btn-red" href="#/marcas">Selecionar meu carro ' +
+      '<a class="btn btn-red" href="' + mainVehicleHash() + '">Ver meu carro ' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
       '<div class="hero-car">' +
       '<img class="hero-cutaway" src="' + heroImg() + '" alt="Cutaway técnico de um carro preparado com upgrades anotados" onerror="this.parentElement.classList.add(\'no-photo\');this.remove()"/>' +
       carSVG(355) + "</div>" +
       '<div class="hero-stats">' +
-      '<div class="hero-stat"><b>10</b><span>marcas</span></div>' +
-      '<div class="hero-stat"><b>50+</b><span>modelos mapeados</span></div>' +
+      '<div class="hero-stat"><b>' + enabledVehicles().length + '</b><span>modelo mapeado</span></div>' +
       '<div class="hero-stat"><b>5</b><span>níveis de preparação</span></div>' +
       '<div class="hero-stat"><b>6</b><span>oficinas parceiras</span></div>' +
       "</div></div></section>" +
 
       '<section class="section"><div class="container">' +
       '<div class="section-head"><div><div class="kicker">Comece aqui</div>' +
-      "<h2>Marcas populares</h2><p>Selecione a marca do seu carro para descobrir specs, upgrades compatíveis e a comunidade do seu modelo.</p></div>" +
-      '<a class="btn btn-ghost btn-sm" href="#/marcas">Ver todas</a></div>' +
-      '<div class="brand-grid">' + brands + "</div>" +
+      "<h2>Modelo disponível</h2><p>Estamos começando pelo Lancer GT — specs completas, upgrades compatíveis e a comunidade do modelo. Mais carros em breve.</p></div></div>" +
+      '<div class="model-grid model-grid-solo">' + models + "</div>" +
       "</div></section>" +
 
       '<section class="section" style="padding-top:0"><div class="container">' +
@@ -221,25 +250,20 @@
      TODAS AS MARCAS
      ========================================================= */
   function renderBrands() {
-    const brands = TS.brands
-      .map(
-        (b) =>
-          '<a class="card brand-card" href="#/marca/' + b.id + '">' +
-          '<span class="brand-mono">' + b.mono + "</span>" +
-          "<b>" + b.name + "</b><span>" + (TS.models[b.id] || []).length + " modelos</span></a>"
-      )
+    const models = enabledVehicles()
+      .map(({ brandId, m }) => modelCard(brandId, m))
       .join("");
 
     app.innerHTML =
       navbar("marcas") +
       "<main>" +
       '<div class="page-head"><div class="container">' +
-      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><span>Marcas</span></div>' +
-      "<h1>Selecione a marca</h1>" +
-      '<p class="sub">Escolha a marca do seu carro para começar.</p>' +
+      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><span>Modelos</span></div>' +
+      "<h1>Selecione o modelo</h1>" +
+      '<p class="sub">Estamos começando com um modelo — mais carros em breve.</p>' +
       "</div></div>" +
       '<section class="section" style="padding-top:44px"><div class="container">' +
-      '<div class="brand-grid">' + brands + "</div>" +
+      '<div class="model-grid model-grid-solo">' + models + "</div>" +
       "</div></section></main>" +
       footer();
   }
@@ -249,36 +273,21 @@
      ========================================================= */
   function renderBrand(brandId) {
     const brand = TS.getBrand(brandId);
-    if (!brand) return renderNotFound();
-    const models = TS.models[brandId] || [];
+    const models = (TS.models[brandId] || []).filter((m) => isEnabled(brandId, m.id));
+    if (!brand || !models.length) return renderNotFound();
 
-    const cards = models
-      .map(
-        (m) =>
-          '<a class="card model-card" href="#/veiculo/' + brandId + "/" + m.id + '">' +
-          '<div class="model-art">' + carSVG(m.hue, { glow: false }) +
-          '<img class="model-photo" src="' + TS.imgFor(brandId, m) + '" alt="' + esc(m.name) + '" loading="lazy" onerror="this.remove()"/>' +
-          "</div>" +
-          '<div class="model-body"><h3>' + m.name + "</h3>" +
-          '<div class="year">' + m.year + "</div>" +
-          '<div class="model-specs">' +
-          "<div><b>" + m.power + "</b><span>Potência</span></div>" +
-          "<div><b>" + m.accel + "</b><span>0–100</span></div>" +
-          "<div><b>" + m.engine.split(" ")[0] + "</b><span>Motor</span></div>" +
-          "</div></div></a>"
-      )
-      .join("");
+    const cards = models.map((m) => modelCard(brandId, m)).join("");
 
     app.innerHTML =
       navbar("marcas") +
       "<main>" +
       '<div class="page-head"><div class="container">' +
-      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><a href="#/marcas">Marcas</a><span class="sep">/</span><span>' + brand.name + "</span></div>" +
+      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><a href="#/marcas">Modelos</a><span class="sep">/</span><span>' + brand.name + "</span></div>" +
       "<h1>" + brand.name + "</h1>" +
-      '<p class="sub">' + models.length + " modelos mapeados · Selecione o seu para ver specs, upgrades e comunidade.</p>" +
+      '<p class="sub">' + models.length + " modelo(s) mapeado(s) · Selecione o seu para ver specs, upgrades e comunidade.</p>" +
       "</div></div>" +
       '<section class="section" style="padding-top:44px"><div class="container">' +
-      '<div class="model-grid">' + cards + "</div>" +
+      '<div class="model-grid model-grid-solo">' + cards + "</div>" +
       "</div></section></main>" +
       footer();
   }
@@ -289,7 +298,7 @@
   function renderVehicle(brandId, modelId) {
     const brand = TS.getBrand(brandId);
     const vehicle = TS.getVehicle(brandId, modelId);
-    if (!brand || !vehicle) return renderNotFound();
+    if (!brand || !vehicle || !isEnabled(brandId, modelId)) return renderNotFound();
 
     const posts = loadPosts(vehicle);
 
@@ -297,7 +306,7 @@
       navbar("marcas") +
       "<main>" +
       '<section class="vehicle-hero"><div class="vehicle-hero-bg"></div><div class="container">' +
-      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><a href="#/marcas">Marcas</a><span class="sep">/</span><a href="#/marca/' + brandId + '">' + brand.name + '</a><span class="sep">/</span><span>' + vehicle.name + "</span></div>" +
+      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><a href="#/marcas">Modelos</a><span class="sep">/</span><span>' + vehicle.name + "</span></div>" +
       '<div class="vehicle-title"><div>' +
       "<h1>" + vehicle.name + "</h1>" +
       '<div class="meta">' + brand.name + " · " + vehicle.year + "</div>" +
