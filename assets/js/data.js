@@ -29,7 +29,7 @@ function v(id, name, year, engine, power, torque, accel, top, gearbox, traction,
 
 TS.models = {
   mitsubishi: [
-    v("lancer-gt", "Lancer GT", "2012–2017", "2.0 16V MIVEC", "160 cv", "20,1 kgfm", "8,8 s", "205 km/h", "CVT 6 marchas (paddle shift)", "Dianteira", "1.395 kg", "10,9 km/l", "R$ 72.400", "aspirado", 355),
+    v("lancer-gt", "Lancer GT", "2012–2017", "2.0 16V MIVEC", "160 cv", "20,1 kgfm", "8,8 s", "205 km/h", "CVT 6 marchas (paddle shift)", "Dianteira", "1.395 kg", "6–7 km/l cidade · 10–12 km/l rodovia", "R$ 72.400", "aspirado", 355),
     v("lancer-mt", "Lancer MT", "2012–2015", "2.0 16V MIVEC", "160 cv", "20,1 kgfm", "8,3 s", "210 km/h", "Manual 5 marchas", "Dianteira", "1.370 kg", "11,4 km/l", "R$ 66.900", "aspirado", 355),
     v("lancer-evolution-x", "Lancer Evolution X", "2008–2015", "2.0 16V Turbo (4B11T)", "295 cv", "37,3 kgfm", "5,4 s", "242 km/h", "TC-SST 6 marchas", "Integral (S-AWC)", "1.600 kg", "8,2 km/l", "R$ 289.000", "turbo", 0),
     v("asx", "ASX", "2011–2021", "2.0 16V MIVEC", "160 cv", "20,1 kgfm", "9,6 s", "198 km/h", "CVT 6 marchas", "Dianteira / AWD", "1.450 kg", "10,2 km/l", "R$ 79.500", "aspirado", 20),
@@ -357,6 +357,28 @@ TS.getSeedPosts = function (vehicle) {
       ],
     },
   ];
+};
+
+/* ---------- Peças ----------
+   Lista única de peças por veículo (chave: "<marca>-<modelo>").
+   Para adicionar uma peça, copie uma linha e edite os campos:
+     icon  → ícone (filter, intake, ecu, exhaust, turbo, clutch, cam,
+             piston, injector, headlight, taillight, wheel, wing,
+             bodykit, coilover, seat)
+     name  → nome da peça
+     desc  → descrição curta
+     price → preço médio
+     compat→ (opcional) nota de compatibilidade */
+TS.parts = {
+  "mitsubishi-lancer-gt": [
+    { icon: "filter",  name: "Filtro de ar esportivo", desc: "Filtro lavável de alto fluxo, encaixe direto na caixa original.", price: "R$ 450", compat: "Compatível com Lancer GT 2012–2017" },
+    { icon: "exhaust", name: "Escape esportivo",       desc: "Sistema em inox com sonoridade esportiva sem drone na rodovia.", price: "R$ 3.500", compat: "Compatível com Lancer GT 2012–2017" },
+    { icon: "ecu",     name: "Remap da ECU",           desc: "Reprogramação da central com acerto em dinamômetro e datalog.", price: "R$ 1.800", compat: "Compatível com Lancer GT 2012–2017" },
+  ],
+};
+
+TS.getParts = function (brandId, model) {
+  return TS.parts[brandId + "-" + model.id] || [];
 };
 
 /* ---------- Helpers ---------- */

@@ -299,8 +299,7 @@
     const brand = TS.getBrand(brandId);
     const vehicle = TS.getVehicle(brandId, modelId);
     if (!brand || !vehicle || !isEnabled(brandId, modelId)) return renderNotFound();
-
-    const posts = loadPosts(vehicle);
+    state.brandId = brandId;
 
     app.innerHTML =
       navbar("marcas") +
@@ -327,8 +326,7 @@
 
       '<div class="tabs"><div class="container tabs-inner">' +
       tabBtn("informacoes", "Informações") +
-      tabBtn("upgrades", "Upgrades") +
-      tabBtn("comunidade", "Comunidade", posts.length) +
+      tabBtn("pecas", "Peças") +
       "</div></div>" +
 
       '<div class="container"><div id="tab-panel" class="tab-panel"></div></div>' +
@@ -355,12 +353,30 @@
 
   function renderTab(vehicle) {
     const panel = document.getElementById("tab-panel");
-    if (state.tab === "informacoes") panel.innerHTML = infoTab(vehicle);
-    else if (state.tab === "upgrades") { panel.innerHTML = upgradesTab(vehicle); bindUpgrades(vehicle); }
-    else { panel.innerHTML = communityTab(vehicle); bindCommunity(vehicle); }
+    if (state.tab === "pecas") { panel.innerHTML = partsTab(vehicle); bindParts(); }
+    else panel.innerHTML = infoTab(vehicle);
     panel.classList.remove("tab-panel");
     void panel.offsetWidth;
     panel.classList.add("tab-panel");
+  }
+
+  /* ---------- Aba Peças ---------- */
+  function partsTab(v) {
+    const parts = TS.getParts(state.brandId, v);
+    return (
+      '<div class="section-head"><div><div class="kicker">Catálogo</div>' +
+      "<h2>Peças para o " + v.name + "</h2>" +
+      "<p>Peças compatíveis com o seu carro, com preço médio de referência.</p></div></div>" +
+      (parts.length
+        ? '<div class="part-grid">' + parts.map(partCard).join("") + "</div>"
+        : '<div class="card" style="padding:32px;text-align:center"><p>Nenhuma peça cadastrada ainda — em breve.</p></div>')
+    );
+  }
+
+  function bindParts() {
+    document.querySelectorAll(".see-product").forEach((b) =>
+      b.addEventListener("click", () => toast("Em breve: redirecionamento para Mercado Livre / Shopee"))
+    );
   }
 
   /* ---------- Aba Informações ---------- */
