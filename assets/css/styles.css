@@ -216,7 +216,16 @@ main { padding-top: 68px; min-height: 100vh; }
   max-width: 880px;
   position: relative;
 }
-.hero-car svg { width: 100%; height: auto; }
+.hero-car svg { width: 100%; height: auto; display: none; }
+.hero-car.no-photo svg { display: block; }
+.hero-cutaway {
+  width: 100%;
+  height: auto;
+  display: block;
+  /* funde as bordas da foto (fundo quase preto) com o fundo do hero */
+  mask-image: radial-gradient(ellipse 94% 90% at 50% 50%, black 60%, transparent 99%);
+  -webkit-mask-image: radial-gradient(ellipse 94% 90% at 50% 50%, black 60%, transparent 99%);
+}
 .hero-stats {
   display: flex;
   justify-content: center;
