@@ -463,6 +463,12 @@
   }
 
   function partCard(p) {
+    const priceHTML = p.price
+      ? '<div class="price"><b>' + p.price + "</b><span>preço médio</span></div>"
+      : '<div class="price"><span>ver preço no anúncio</span></div>';
+    const buttonHTML = p.link
+      ? '<a class="btn btn-ghost btn-sm" href="' + esc(p.link) + '" target="_blank" rel="noopener nofollow sponsored">Ver produto ' + I.external + "</a>"
+      : '<button class="btn btn-ghost btn-sm see-product">Ver produto ' + I.external + "</button>";
     return (
       '<div class="card part-card">' +
       '<div class="part-thumb">' + I[p.icon] + "</div>" +
@@ -470,10 +476,7 @@
       (p.compat
         ? '<div class="part-compat">' + I.check + esc(p.compat) + "</div>"
         : "") +
-      '<div class="part-foot">' +
-      '<div class="price"><b>' + p.price + "</b><span>preço médio</span></div>" +
-      '<button class="btn btn-ghost btn-sm see-product">Ver produto ' + I.external + "</button>" +
-      "</div></div>"
+      '<div class="part-foot">' + priceHTML + buttonHTML + "</div></div>"
     );
   }
 
