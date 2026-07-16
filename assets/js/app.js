@@ -222,15 +222,11 @@
       '<div class="hero-car">' +
       '<img class="hero-cutaway" src="' + heroImg() + '" alt="Cutaway técnico de um carro preparado com upgrades anotados" onerror="this.parentElement.classList.add(\'no-photo\');this.remove()"/>' +
       carSVG(355) + "</div>" +
-      '<div class="hero-stats">' +
-      '<div class="hero-stat"><b>' + enabledVehicles().length + '</b><span>modelo mapeado</span></div>' +
-      '<div class="hero-stat"><b>5</b><span>níveis de preparação</span></div>' +
-      '<div class="hero-stat"><b>6</b><span>oficinas parceiras</span></div>' +
-      "</div></div></section>" +
+      "</div></section>" +
 
       '<section class="section"><div class="container">' +
       '<div class="section-head"><div><div class="kicker">Comece aqui</div>' +
-      "<h2>Modelo disponível</h2><p>Estamos começando pelo Lancer GT — specs completas, upgrades compatíveis e a comunidade do modelo. Mais carros em breve.</p></div></div>" +
+      "<h2>Modelo disponível</h2><p>Estamos começando pelo Lancer GT — ficha técnica completa e peças compatíveis. Mais carros em breve.</p></div></div>" +
       '<div class="model-grid model-grid-solo">' + models + "</div>" +
       "</div></section>" +
 
