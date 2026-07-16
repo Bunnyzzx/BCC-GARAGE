@@ -367,13 +367,41 @@ TS.getSeedPosts = function (vehicle) {
              bodykit, coilover, seat)
      name  → nome da peça
      desc  → descrição curta
-     price → preço médio
-     compat→ (opcional) nota de compatibilidade */
+     price → preço médio (opcional; sem preço mostra "ver preço no anúncio")
+     compat→ (opcional) nota de compatibilidade
+     link  → (opcional) link de afiliado; o botão "Ver produto" abre em nova aba */
 TS.parts = {
   "mitsubishi-lancer-gt": [
-    { icon: "filter",  name: "Filtro de ar esportivo", desc: "Filtro lavável de alto fluxo, encaixe direto na caixa original.", price: "R$ 450", compat: "Compatível com Lancer GT 2012–2017" },
-    { icon: "exhaust", name: "Escape esportivo",       desc: "Sistema em inox com sonoridade esportiva sem drone na rodovia.", price: "R$ 3.500", compat: "Compatível com Lancer GT 2012–2017" },
-    { icon: "ecu",     name: "Remap da ECU",           desc: "Reprogramação da central com acerto em dinamômetro e datalog.", price: "R$ 1.800", compat: "Compatível com Lancer GT 2012–2017" },
+    {
+      icon: "filter", name: "Filtro de ar Inbox RS Ultra (RS29118)",
+      desc: "Filtro esportivo inbox lavável de alto fluxo, encaixe direto na caixa original.",
+      compat: "Lancer 2.0 · ASX 2.0",
+      link: "https://www.mercadolivre.com.br/filtro-ar-rs-ultra-mitsubishi-lancer-asx-20-2013-rs29118/up/MLBU2184998797?pdp_filters=item_id%3AMLB2764500304&matt_tool=38524122&ua=A426TW16stNAavermcPZQnT-w-x-60ibMIx27c-21noeyJzN#origin=share&sid=share&wid=MLB2764500304&action=copy",
+    },
+    {
+      icon: "intake", name: "Kit Intake NOX + Filtro K&N + Box defletora",
+      desc: "Kit de admissão completo com filtro K&N e caixa defletora de ar frio.",
+      compat: "Lancer MT / CVT / GT 2.0",
+      link: "https://www.mercadolivre.com.br/intake--filtro-kn--def--lancer-mt-cvt-gt-20/up/MLBU1714259742?pdp_filters=item_id%3AMLB1541478709&matt_tool=38524122&ua=bS-gljQvDH6bCqk8jikW7rQ3ZaVDPn7IJ7O_YGcezDTgKvh9#origin=share&sid=share&wid=MLB1541478709&action=copy",
+    },
+    {
+      icon: "seat", name: "Aplique friso do painel Vermelho Sport",
+      desc: "Acabamento vermelho esportivo para o friso do painel interno.",
+      compat: "Lancer 2008–2019",
+      link: "https://www.mercadolivre.com.br/aplique-friso-painel-vermelho-sport-lancer-2008-a-2019/up/MLBU803031450?pdp_filters=item_id%3AMLB4585744390&matt_tool=38524122&ua=aNpEmPIEdgdshCJwAGtRVX9quWZUP1B97qDJehsdC8uHwXrg#origin=share&sid=share&wid=MLB4585744390&action=copy",
+    },
+    {
+      icon: "exhaust", name: "Junta do coletor de escape",
+      desc: "Junta de vedação do coletor de escapamento para motores 2.0.",
+      compat: "Lancer · TR4 2.0 Flex",
+      link: "https://www.mercadolivre.com.br/junta-coletor-escape-mitsubishi-lancer-tr4-20-flex/up/MLBU3967818496?pdp_filters=item_id%3AMLB4674594361&matt_tool=38524122&ua=yHAYcihIyRSkWQsAfSaFJ_z4JlvEMiIvpLkkCu_EJMPMThcZ#origin=share&sid=share&wid=MLB4674594361&action=copy",
+    },
+    {
+      icon: "coilover", name: "Pro-Kit molas esportivas Eibach",
+      desc: "Conjunto de molas esportivas com redução de altura e mais estabilidade.",
+      compat: "Lancer 2.0 2011–2019",
+      link: "https://www.mercadolivre.com.br/prokit-molas-eibach-mitsubishi-lancer-20-de-2011-ate-2019/up/MLBU1165107367?pdp_filters=item_id%3AMLB4623396732&matt_tool=38524122&ua=RWK_G4CDHxju0CGl_UtqfwJRTqMZ3FDWGfqXNtbQMrh_k6sb#origin=share&sid=share&wid=MLB4623396732&action=copy",
+    },
   ],
 };
 
