@@ -366,15 +366,43 @@ TS.getSeedPosts = function (vehicle) {
    photo → foto pessoal em assets/img/garage/<photo>.jpg; se o arquivo
            não existir, o card usa a foto de banco do modelo. */
 TS.garage = [
-  { owner: "Bryan", name: "bastblack_", brandId: "fiat", modelId: "fastback-abarth", photo: "fastblack.webp", focus: "center 42%" },
-  { owner: "Caio", name: "shiden_lancer", brandId: "mitsubishi", modelId: "lancer-gt", photo: "lancer_shiden.webp", focus: "center 46%" },
-  { owner: "Cauã", name: "e36.bl0odymary", brandId: "bmw", modelId: "325i-e36", photo: "bm_caua.PNG", focus: "center 62%" },
+  {
+    owner: "Bryan", name: "bastblack_", brandId: "fiat", modelId: "fastback-abarth",
+    photo: "fastblack.webp", focus: "center 42%",
+    specs: { year: "2022/2023", power: "≈220 cv", torque: "31,5 kgfm", accel: "8,0 s",
+             consumption: "7 km/l cidade · 15 km/l rodovia (gasolina)" },
+    mods: "Fastback Limited Edition Powered by Abarth — 170 whp na roda. Piggyback: +30 whp e +4 kgfm sobre os 185 cv / 27,5 kgfm de fábrica.",
+  },
+  {
+    owner: "Caio", name: "shiden_lancer", brandId: "mitsubishi", modelId: "lancer-gt",
+    photo: "lancer_shiden.webp", focus: "center 46%",
+    specs: { year: "2012", power: "≈180 cv", torque: "20,1 kgfm", accel: "8,6 s" },
+  },
+  {
+    owner: "Cauã", name: "e36.bl0odymary", brandId: "bmw", modelId: "325i-e36",
+    photo: "bm_caua.PNG", focus: "center 62%",
+    specs: { engine: "2.5 24V M50B25 (aspirado)", power: "182 hp (roda)", torque: "33 kgfm",
+             accel: "7,0 s", gearbox: "Getrag manual 5 marchas" },
+    oil: "5W40",
+  },
 ];
 
 TS.garagePhoto = function (g) {
   const key = "garage-" + g.photo;
   if (window.TS_IMG_DATA && window.TS_IMG_DATA[key]) return window.TS_IMG_DATA[key];
   return "assets/img/garage/" + g.photo;
+};
+
+/* entrada da garagem para um veículo (ou undefined) */
+TS.garageEntry = function (brandId, modelId) {
+  return (TS.garage || []).find((g) => g.brandId === brandId && g.modelId === modelId);
+};
+
+/* veículo com as specs pessoais aplicadas por cima das de catálogo */
+TS.mergedVehicle = function (g) {
+  const base = TS.getVehicle(g.brandId, g.modelId);
+  if (!base) return null;
+  return Object.assign({}, base, g.specs || {}, { oil: g.oil, mods: g.mods });
 };
 
 /* ---------- Peças ----------

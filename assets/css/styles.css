@@ -593,6 +593,8 @@ main { padding-top: 68px; min-height: 100vh; }
 .info-card span { font-size: 12px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
 .info-card b { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-top: -8px; }
 .info-card.highlight { border-color: rgba(225,6,0,0.35); background: linear-gradient(160deg, rgba(225,6,0,0.07), var(--surface) 55%); }
+.mods-card { margin-top: 20px; border-color: rgba(225,6,0,0.28); }
+.mods-card b { font-size: 15px; font-weight: 600; line-height: 1.5; margin-top: 0; color: var(--text); }
 
 /* ---------- Aba Upgrades ---------- */
 .seg {
