@@ -1,5 +1,5 @@
 /* =========================================================
-   TuneSpec — Design System
+   BCC Garage — Design System
    Preto profundo, muito respiro, acento vermelho pontual.
    ========================================================= */
 
@@ -69,11 +69,31 @@ img, svg { display: block; max-width: 100%; }
 .logo {
   display: flex;
   align-items: center;
+  gap: 9px;
   font-weight: 800;
   font-size: 19px;
   letter-spacing: -0.03em;
 }
-.logo .logo-mark { margin-right: 10px; }
+/* wordmark BCC Garage: BCC branco em itálico + tarja vermelha inclinada */
+.logo-bcc {
+  font-weight: 900;
+  font-style: italic;
+  font-size: 23px;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 1;
+}
+.logo-garage {
+  background: var(--red);
+  color: #0B0B0B;
+  font-weight: 800;
+  font-style: italic;
+  font-size: 10.5px;
+  letter-spacing: 0.3em;
+  padding: 4px 8px 4px 11px;
+  transform: skewX(-12deg);
+  line-height: 1;
+}
 .logo-mark {
   width: 28px;
   height: 28px;
@@ -86,7 +106,6 @@ img, svg { display: block; max-width: 100%; }
   font-size: 13px;
   font-weight: 900;
 }
-.logo span { color: var(--red); }
 .nav-links {
   display: flex;
   align-items: center;

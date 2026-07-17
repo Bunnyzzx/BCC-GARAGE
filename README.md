@@ -1,8 +1,8 @@
-# TuneSpec
+# BCC Garage
 
 **Tudo o que seu carro pode se tornar.**
 
-TuneSpec é uma plataforma para entusiastas automotivos: escolha seu carro, entenda as especificações, descubra upgrades compatíveis (com peças, preços e profissionais recomendados) e participe da comunidade de donos do mesmo modelo.
+BCC Garage é uma plataforma para entusiastas automotivos: escolha seu carro, entenda as especificações, descubra upgrades compatíveis (com peças, preços e profissionais recomendados) e participe da comunidade de donos do mesmo modelo.
 
 Não é um e-commerce — é um catálogo inteligente + guia de preparação + comunidade automotiva.
 

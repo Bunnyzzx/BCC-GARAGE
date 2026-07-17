@@ -1,5 +1,5 @@
 /* =========================================================
-   TuneSpec — App (roteador hash + views)
+   BCC Garage — App (roteador hash + views)
    ========================================================= */
 
 (function () {
@@ -159,7 +159,7 @@
   function navbar(active) {
     return (
       '<header class="nav"><div class="container nav-inner">' +
-      '<a class="logo" href="#/"><span class="logo-mark">TS</span>Tune<span>Spec</span></a>' +
+      '<a class="logo" href="#/"><span class="logo-bcc">BCC</span><span class="logo-garage">GARAGE</span></a>' +
       '<nav class="nav-links">' +
       '<a href="#/" class="' + (active === "home" ? "active" : "") + '">Início</a>' +
       '<a href="#/marcas" class="' + (active === "marcas" ? "active" : "") + '">Modelos</a>' +
@@ -173,14 +173,14 @@
     return (
       "<footer><div class='container'>" +
       "<div class='footer-inner'>" +
-      "<div><a class='logo' href='#/'><span class='logo-mark'>TS</span>Tune<span>Spec</span></a>" +
+      "<div><a class='logo' href='#/'><span class='logo-bcc'>BCC</span><span class='logo-garage'>GARAGE</span></a>" +
       "<p>A plataforma definitiva para quem quer entender, modificar e evoluir o próprio carro — com informação confiável, peças compatíveis e profissionais recomendados.</p></div>" +
       "<div class='footer-links'>" +
       "<div><h5>Plataforma</h5><a href='#/marcas'>Modelos</a><a href='#/marcas'>Upgrades</a></div>" +
       "<div><h5>Comunidade</h5><a href='#/marcas'>Posts</a><a href='#/marcas'>Profissionais</a></div>" +
       "<div><h5>Empresa</h5><a href='#/'>Sobre</a><a href='#/'>Contato</a><a href='#/'>Termos</a></div>" +
       "</div></div>" +
-      "<div class='footer-bottom'><span>© 2026 TuneSpec. Todos os direitos reservados.</span><span>Feito para entusiastas.</span></div>" +
+      "<div class='footer-bottom'><span>© 2026 BCC Garage. Todos os direitos reservados.</span><span>Feito para entusiastas.</span></div>" +
       "</div></footer>"
     );
   }
