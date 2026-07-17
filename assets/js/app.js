@@ -193,15 +193,20 @@
   /* =========================================================
      HOME
      ========================================================= */
-  function modelCard(brandId, m, owner) {
+  function modelCard(brandId, m, opts) {
+    opts = opts || {};
+    const stock = TS.imgFor(brandId, m);
+    const photo = opts.photo
+      ? '<img class="model-photo" src="' + opts.photo + '" alt="' + esc(opts.name || m.name) + '" loading="lazy" onerror="this.onerror=function(){this.remove()};this.src=\'' + stock + '\'"/>'
+      : '<img class="model-photo" src="' + stock + '" alt="' + esc(m.name) + '" loading="lazy" onerror="this.remove()"/>';
     return (
       '<a class="card model-card" href="#/veiculo/' + brandId + "/" + m.id + '">' +
-      (owner ? '<div class="owner-chip">' + esc(owner) + "</div>" : "") +
+      (opts.owner ? '<div class="owner-chip">' + esc(opts.owner) + "</div>" : "") +
       '<div class="model-art">' + carSVG(m.hue, { glow: false }) +
-      '<img class="model-photo" src="' + TS.imgFor(brandId, m) + '" alt="' + esc(m.name) + '" loading="lazy" onerror="this.remove()"/>' +
+      photo +
       "</div>" +
-      '<div class="model-body"><h3>' + m.name + "</h3>" +
-      '<div class="year">' + m.year + "</div>" +
+      '<div class="model-body"><h3>' + esc(opts.name || m.name) + "</h3>" +
+      '<div class="year">' + (opts.name ? m.name + " · " : "") + m.year + "</div>" +
       '<div class="model-specs">' +
       "<div><b>" + m.power + "</b><span>Potência</span></div>" +
       "<div><b>" + m.accel + "</b><span>0–100</span></div>" +
@@ -214,7 +219,7 @@
     const garage = (TS.garage || [])
       .map((g) => {
         const m = TS.getVehicle(g.brandId, g.modelId);
-        return m ? modelCard(g.brandId, m, g.owner) : "";
+        return m ? modelCard(g.brandId, m, { owner: g.owner, name: g.name, photo: TS.garagePhoto(g) }) : "";
       })
       .join("");
 

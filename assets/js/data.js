@@ -361,12 +361,21 @@ TS.getSeedPosts = function (vehicle) {
 };
 
 /* ---------- Garagem BCC ----------
-   Os carros da equipe, exibidos na home (ordem: como estão aqui). */
+   Os carros da equipe, exibidos na home (ordem: como estão aqui).
+   name  → nome próprio do carro (aparece no card no lugar do modelo)
+   photo → foto pessoal em assets/img/garage/<photo>.jpg; se o arquivo
+           não existir, o card usa a foto de banco do modelo. */
 TS.garage = [
-  { owner: "Bryan", brandId: "fiat", modelId: "fastback-abarth" },
-  { owner: "Caio", brandId: "mitsubishi", modelId: "lancer-gt" },
-  { owner: "Cauã", brandId: "bmw", modelId: "325i-e36" },
+  { owner: "Bryan", name: "bastblack_", brandId: "fiat", modelId: "fastback-abarth", photo: "bastblack" },
+  { owner: "Caio", name: "shiden_lancer", brandId: "mitsubishi", modelId: "lancer-gt", photo: "shiden-lancer" },
+  { owner: "Cauã", name: "e36.bl0odymary", brandId: "bmw", modelId: "325i-e36", photo: "e36-bloodymary" },
 ];
+
+TS.garagePhoto = function (g) {
+  const key = "garage-" + g.photo;
+  if (window.TS_IMG_DATA && window.TS_IMG_DATA[key]) return window.TS_IMG_DATA[key];
+  return "assets/img/garage/" + g.photo + ".jpg";
+};
 
 /* ---------- Peças ----------
    Lista única de peças por veículo (chave: "<marca>-<modelo>").
