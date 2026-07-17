@@ -1,5 +1,5 @@
 /* =========================================================
-   TuneSpec — Camada de dados (MVP)
+   BCC Garage — Camada de dados (MVP)
    Dados mockados: marcas, veículos, upgrades, profissionais
    e comunidade. Em produção, isto vem da API.
    ========================================================= */

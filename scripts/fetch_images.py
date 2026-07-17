@@ -8,7 +8,7 @@ import json, os, re, ssl, sys, time, urllib.parse, urllib.request
 
 CA = "/root/.ccr/ca-bundle.crt"
 CTX = ssl.create_default_context(cafile=CA)
-UA = "TuneSpecMVP/1.0 (educational demo; contact: caioxyz1701@gmail.com)"
+UA = "BCCGarage/1.0 (educational demo; contact: caioxyz1701@gmail.com)"
 
 OUT_960 = "/home/user/TuneSpec/assets/img/vehicles"
 OUT_500 = os.environ.get("TS_IMG500", os.path.join(os.environ.get("TMPDIR", "/tmp"), "tunespec-img500"))
