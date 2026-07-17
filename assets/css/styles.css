@@ -74,25 +74,41 @@ img, svg { display: block; max-width: 100%; }
   font-size: 19px;
   letter-spacing: -0.03em;
 }
-/* wordmark BCC Garage: BCC branco em itálico + tarja vermelha inclinada */
+/* wordmark BCC Garage (fiel à logo): BCC branco em itálico sobre a
+   tarja vermelha inclinada com GARAGE e 4 barras à direita */
+.logo {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
 .logo-bcc {
   font-weight: 900;
   font-style: italic;
-  font-size: 23px;
-  letter-spacing: -0.01em;
+  font-size: 21px;
+  letter-spacing: 0.04em;
   color: #fff;
   line-height: 1;
 }
 .logo-garage {
+  position: relative;
   background: var(--red);
   color: #0B0B0B;
   font-weight: 800;
   font-style: italic;
-  font-size: 10.5px;
-  letter-spacing: 0.3em;
-  padding: 4px 8px 4px 11px;
-  transform: skewX(-12deg);
+  font-size: 8px;
+  letter-spacing: 0.34em;
+  padding: 2.5px 16px 2.5px 7px;
+  transform: skewX(-14deg);
   line-height: 1;
+}
+.logo-garage::after {
+  content: "";
+  position: absolute;
+  right: -14px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: repeating-linear-gradient(90deg, var(--red) 0 2.5px, transparent 2.5px 5.5px);
 }
 .logo-mark {
   width: 28px;
