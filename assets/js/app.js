@@ -196,8 +196,9 @@
   function modelCard(brandId, m, opts) {
     opts = opts || {};
     const stock = TS.imgFor(brandId, m);
+    const focus = opts.focus ? ' style="object-position:' + opts.focus + '"' : "";
     const photo = opts.photo
-      ? '<img class="model-photo" src="' + opts.photo + '" alt="' + esc(opts.name || m.name) + '" loading="lazy" onerror="this.onerror=function(){this.remove()};this.src=\'' + stock + '\'"/>'
+      ? '<img class="model-photo" src="' + opts.photo + '" alt="' + esc(opts.name || m.name) + '"' + focus + ' loading="lazy" onerror="this.onerror=function(){this.remove()};this.removeAttribute(\'style\');this.src=\'' + stock + '\'"/>'
       : '<img class="model-photo" src="' + stock + '" alt="' + esc(m.name) + '" loading="lazy" onerror="this.remove()"/>';
     return (
       '<a class="card model-card" href="#/veiculo/' + brandId + "/" + m.id + '">' +
@@ -219,7 +220,7 @@
     const garage = (TS.garage || [])
       .map((g) => {
         const m = TS.getVehicle(g.brandId, g.modelId);
-        return m ? modelCard(g.brandId, m, { owner: g.owner, name: g.name, photo: TS.garagePhoto(g) }) : "";
+        return m ? modelCard(g.brandId, m, { owner: g.owner, name: g.name, photo: TS.garagePhoto(g), focus: g.focus }) : "";
       })
       .join("");
 

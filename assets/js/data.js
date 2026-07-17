@@ -366,15 +366,15 @@ TS.getSeedPosts = function (vehicle) {
    photo → foto pessoal em assets/img/garage/<photo>.jpg; se o arquivo
            não existir, o card usa a foto de banco do modelo. */
 TS.garage = [
-  { owner: "Bryan", name: "bastblack_", brandId: "fiat", modelId: "fastback-abarth", photo: "bastblack" },
-  { owner: "Caio", name: "shiden_lancer", brandId: "mitsubishi", modelId: "lancer-gt", photo: "shiden-lancer" },
-  { owner: "Cauã", name: "e36.bl0odymary", brandId: "bmw", modelId: "325i-e36", photo: "e36-bloodymary" },
+  { owner: "Bryan", name: "bastblack_", brandId: "fiat", modelId: "fastback-abarth", photo: "fastblack.webp", focus: "center 42%" },
+  { owner: "Caio", name: "shiden_lancer", brandId: "mitsubishi", modelId: "lancer-gt", photo: "lancer_shiden.webp", focus: "center 46%" },
+  { owner: "Cauã", name: "e36.bl0odymary", brandId: "bmw", modelId: "325i-e36", photo: "bm_caua.PNG", focus: "center 62%" },
 ];
 
 TS.garagePhoto = function (g) {
   const key = "garage-" + g.photo;
   if (window.TS_IMG_DATA && window.TS_IMG_DATA[key]) return window.TS_IMG_DATA[key];
-  return "assets/img/garage/" + g.photo + ".jpg";
+  return "assets/img/garage/" + g.photo;
 };
 
 /* ---------- Peças ----------
