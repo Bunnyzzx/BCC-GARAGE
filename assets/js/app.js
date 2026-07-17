@@ -142,6 +142,11 @@
   function isEnabled(brandId, modelId) {
     return (ENABLED[brandId] || []).includes(modelId);
   }
+  /* carros da garagem têm página acessível mesmo fora do catálogo */
+  function isVisible(brandId, modelId) {
+    return isEnabled(brandId, modelId) ||
+      (TS.garage || []).some((g) => g.brandId === brandId && g.modelId === modelId);
+  }
   function enabledVehicles() {
     const out = [];
     for (const brandId of Object.keys(ENABLED)) {
@@ -188,9 +193,10 @@
   /* =========================================================
      HOME
      ========================================================= */
-  function modelCard(brandId, m) {
+  function modelCard(brandId, m, owner) {
     return (
       '<a class="card model-card" href="#/veiculo/' + brandId + "/" + m.id + '">' +
+      (owner ? '<div class="owner-chip">' + esc(owner) + "</div>" : "") +
       '<div class="model-art">' + carSVG(m.hue, { glow: false }) +
       '<img class="model-photo" src="' + TS.imgFor(brandId, m) + '" alt="' + esc(m.name) + '" loading="lazy" onerror="this.remove()"/>' +
       "</div>" +
@@ -205,8 +211,11 @@
   }
 
   function renderHome() {
-    const models = enabledVehicles()
-      .map(({ brandId, m }) => modelCard(brandId, m))
+    const garage = (TS.garage || [])
+      .map((g) => {
+        const m = TS.getVehicle(g.brandId, g.modelId);
+        return m ? modelCard(g.brandId, m, g.owner) : "";
+      })
       .join("");
 
     app.innerHTML =
@@ -225,9 +234,11 @@
       "</div></section>" +
 
       '<section class="section"><div class="container">' +
-      '<div class="section-head"><div><div class="kicker">Comece aqui</div>' +
-      "<h2>Modelo disponível</h2><p>Estamos começando pelo Lancer GT — ficha técnica completa e peças compatíveis. Mais carros em breve.</p></div></div>" +
-      '<div class="model-grid model-grid-solo">' + models + "</div>" +
+      '<div class="section-head"><div><div class="kicker">A equipe</div>' +
+      "<h2>Nossa garagem</h2><p>Os carros de quem faz o BCC Garage acontecer.</p></div></div>" +
+      '<div class="model-grid model-grid-solo">' + garage + "</div>" +
+      '<div class="garage-more"><a class="btn btn-ghost" href="#/marcas">Ver modelos ' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>' +
       "</div></section>" +
 
       '<section class="section" style="padding-top:0"><div class="container">' +
@@ -294,7 +305,7 @@
   function renderVehicle(brandId, modelId) {
     const brand = TS.getBrand(brandId);
     const vehicle = TS.getVehicle(brandId, modelId);
-    if (!brand || !vehicle || !isEnabled(brandId, modelId)) return renderNotFound();
+    if (!brand || !vehicle || !isVisible(brandId, modelId)) return renderNotFound();
     state.brandId = brandId;
 
     app.innerHTML =

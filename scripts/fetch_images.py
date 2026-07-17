@@ -43,6 +43,7 @@ QUERIES = {
     "bmw-m3-competition": "BMW M3 G80",
     "bmw-118i": "BMW 1 Series F40",
     "bmw-x1-sdrive20i": "BMW X1 U11",
+    "bmw-325i-e36": "BMW 325i E36 sedan",
     "toyota-corolla-altis": "Toyota Corolla E210 sedan",
     "toyota-corolla-gr-s": "Toyota Corolla GR Sport sedan",
     "toyota-gr-supra": "Toyota Supra J29",

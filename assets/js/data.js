@@ -63,6 +63,7 @@ TS.models = {
     v("m3-competition", "M3 Competition", "2021–2025", "3.0 Biturbo (S58)", "510 cv", "66,3 kgfm", "3,9 s", "290 km/h", "Automático 8 marchas", "Traseira", "1.730 kg", "7,8 km/l", "R$ 719.000", "turbo", 0),
     v("118i", "118i", "2020–2025", "1.5 TwinPower Turbo", "140 cv", "22,4 kgfm", "8,7 s", "213 km/h", "DCT 7 marchas", "Dianteira", "1.395 kg", "11,5 km/l", "R$ 189.000", "turbo", 20),
     v("x1-sdrive20i", "X1 sDrive20i", "2023–2025", "2.0 TwinPower Turbo", "204 cv", "30,6 kgfm", "7,4 s", "233 km/h", "DCT 7 marchas", "Dianteira", "1.575 kg", "10,2 km/l", "R$ 299.000", "turbo", 150),
+    v("325i-e36", "325i (E36)", "1992–1998", "2.5 24V (M50B25)", "192 cv", "25,0 kgfm", "7,8 s", "233 km/h", "Manual 5 marchas", "Traseira", "1.320 kg", "7–8 km/l cidade · 10–11 km/l rodovia", "R$ 45.000", "aspirado", 210),
   ],
   toyota: [
     v("corolla-altis", "Corolla Altis Hybrid", "2020–2025", "1.8 Híbrido", "122 cv", "16,6 kgfm", "10,8 s", "180 km/h", "CVT", "Dianteira", "1.415 kg", "17,5 km/l", "R$ 159.000", "aspirado", 210),
@@ -358,6 +359,14 @@ TS.getSeedPosts = function (vehicle) {
     },
   ];
 };
+
+/* ---------- Garagem BCC ----------
+   Os carros da equipe, exibidos na home (ordem: como estão aqui). */
+TS.garage = [
+  { owner: "Bryan", brandId: "fiat", modelId: "fastback-abarth" },
+  { owner: "Caio", brandId: "mitsubishi", modelId: "lancer-gt" },
+  { owner: "Cauã", brandId: "bmw", modelId: "325i-e36" },
+];
 
 /* ---------- Peças ----------
    Lista única de peças por veículo (chave: "<marca>-<modelo>").
