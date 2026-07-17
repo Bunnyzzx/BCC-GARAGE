@@ -219,7 +219,7 @@
   function renderHome() {
     const garage = (TS.garage || [])
       .map((g) => {
-        const m = TS.getVehicle(g.brandId, g.modelId);
+        const m = TS.mergedVehicle(g);
         return m ? modelCard(g.brandId, m, { owner: g.owner, name: g.name, photo: TS.garagePhoto(g), focus: g.focus }) : "";
       })
       .join("");
@@ -310,23 +310,29 @@
      ========================================================= */
   function renderVehicle(brandId, modelId) {
     const brand = TS.getBrand(brandId);
-    const vehicle = TS.getVehicle(brandId, modelId);
+    const gEntry = TS.garageEntry(brandId, modelId);
+    const vehicle = gEntry ? TS.mergedVehicle(gEntry) : TS.getVehicle(brandId, modelId);
     if (!brand || !vehicle || !isVisible(brandId, modelId)) return renderNotFound();
     state.brandId = brandId;
+
+    const title = gEntry ? gEntry.name : vehicle.name;
+    const meta = brand.name + " · " + vehicle.name + " · " + vehicle.year;
+    const photoSrc = gEntry ? TS.garagePhoto(gEntry) : TS.imgFor(brandId, vehicle);
+    const photoStyle = gEntry && gEntry.focus ? ' style="object-position:' + gEntry.focus + '"' : "";
 
     app.innerHTML =
       navbar("marcas") +
       "<main>" +
       '<section class="vehicle-hero"><div class="vehicle-hero-bg"></div><div class="container">' +
-      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><a href="#/marcas">Modelos</a><span class="sep">/</span><span>' + vehicle.name + "</span></div>" +
+      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><a href="#/marcas">Modelos</a><span class="sep">/</span><span>' + esc(title) + "</span></div>" +
       '<div class="vehicle-title"><div>' +
-      "<h1>" + vehicle.name + "</h1>" +
-      '<div class="meta">' + brand.name + " · " + vehicle.year + "</div>" +
+      "<h1>" + esc(title) + "</h1>" +
+      '<div class="meta">' + meta + "</div>" +
       "</div>" +
       '<div class="fipe-chip"><span>Preço médio FIPE</span><b>' + vehicle.fipe + "</b></div>" +
       "</div>" +
       '<div class="vehicle-art">' + carSVG(vehicle.hue) +
-      '<img class="vehicle-photo" src="' + TS.imgFor(brandId, vehicle) + '" alt="' + esc(vehicle.name) + '" onerror="this.remove()"/>' +
+      '<img class="vehicle-photo" src="' + photoSrc + '" alt="' + esc(title) + '"' + photoStyle + ' onerror="this.remove()"/>' +
       "</div>" +
       '<div class="spec-strip">' +
       "<div><b>" + vehicle.engine + "</b><span>Motor</span></div>" +
@@ -406,9 +412,10 @@
       ["traction", "Tração", v.traction],
       ["price", "Preço FIPE", v.fipe],
     ];
+    if (v.oil) items.splice(8, 0, ["fuel", "Óleo", v.oil]);
     return (
       '<div class="section-head"><div><div class="kicker">Ficha técnica</div>' +
-      "<h2>Especificações do " + v.name + "</h2>" +
+      "<h2>Especificações do " + esc(v.name) + "</h2>" +
       "<p>Os números que realmente importam, direto ao ponto.</p></div></div>" +
       '<div class="info-grid">' +
       items
@@ -419,7 +426,11 @@
             "<span>" + it[1] + "</span><b>" + it[2] + "</b></div>"
         )
         .join("") +
-      "</div>"
+      "</div>" +
+      (v.mods
+        ? '<div class="card info-card mods-card"><div class="ic">' + I.ecu + "</div>" +
+          "<span>Preparação</span><b>" + esc(v.mods) + "</b></div>"
+        : "")
     );
   }
 
