@@ -426,6 +426,7 @@ main { padding-top: 68px; min-height: 100vh; }
   border-bottom: 1px solid var(--border);
   overflow: hidden;
 }
+.model-art--tall { height: 240px; }
 .model-art svg { width: 78%; height: auto; opacity: 0.95; }
 .model-art .model-photo {
   position: absolute;
@@ -512,6 +513,17 @@ main { padding-top: 68px; min-height: 100vh; }
   border: 1px solid var(--border-strong);
   box-shadow: var(--shadow);
 }
+/* carros da garagem: foto pessoal inteira, sem recorte do frame */
+.vehicle-art--photo { max-width: 620px; }
+.vehicle-art--photo .vehicle-photo {
+  position: static;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 560px;
+  margin: 0 auto;
+  object-fit: contain;
+}
 
 .spec-strip {
   position: relative;
@@ -595,6 +607,26 @@ main { padding-top: 68px; min-height: 100vh; }
 .info-card.highlight { border-color: rgba(225,6,0,0.35); background: linear-gradient(160deg, rgba(225,6,0,0.07), var(--surface) 55%); }
 .mods-card { margin-top: 20px; border-color: rgba(225,6,0,0.28); }
 .mods-card b { font-size: 15px; font-weight: 600; line-height: 1.5; margin-top: 0; color: var(--text); }
+.build-block { margin-top: 28px; }
+.build-block .kicker { margin-bottom: 16px; }
+.build-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.build-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+}
+.build-item svg { width: 15px; height: 15px; color: var(--red); flex-shrink: 0; }
+@media (max-width: 720px) { .build-grid { grid-template-columns: 1fr; } }
 
 /* ---------- Aba Upgrades ---------- */
 .seg {
