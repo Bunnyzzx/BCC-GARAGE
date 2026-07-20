@@ -351,40 +351,14 @@
       "<div><b>" + vehicle.year + "</b><span>Ano</span></div>" +
       "</div></div></section>" +
 
-      '<div class="tabs"><div class="container tabs-inner">' +
-      tabBtn("informacoes", "Informações") +
-      tabBtn("pecas", "Peças") +
-      "</div></div>" +
-
-      '<div class="container"><div id="tab-panel" class="tab-panel"></div></div>' +
+      '<div class="container">' +
+      '<section class="v-section">' + infoTab(vehicle) + "</section>" +
+      '<section class="v-section v-section--parts">' + partsTab(vehicle) + "</section>" +
+      "</div>" +
       "</main>" +
       footer();
 
-    function tabBtn(id, label, count) {
-      return (
-        '<button class="tab' + (state.tab === id ? " active" : "") + '" data-tab="' + id + '">' +
-        label + (count ? '<span class="count">' + count + "</span>" : "") + "</button>"
-      );
-    }
-
-    document.querySelectorAll(".tab").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        state.tab = btn.dataset.tab;
-        document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
-        renderTab(vehicle);
-      });
-    });
-
-    renderTab(vehicle);
-  }
-
-  function renderTab(vehicle) {
-    const panel = document.getElementById("tab-panel");
-    if (state.tab === "pecas") { panel.innerHTML = partsTab(vehicle); bindParts(); }
-    else panel.innerHTML = infoTab(vehicle);
-    panel.classList.remove("tab-panel");
-    void panel.offsetWidth;
-    panel.classList.add("tab-panel");
+    bindParts();
   }
 
   /* ---------- Aba Peças ---------- */
