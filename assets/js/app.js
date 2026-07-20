@@ -137,15 +137,10 @@
   /* ---------- Catálogo visível no MVP ----------
      Os dados completos (todas as marcas/modelos) continuam em data.js
      e as fotos em assets/img/vehicles/ — aqui só se define o que a UI mostra. */
-  const ENABLED = { mitsubishi: ["lancer-gt"] };
+  const ENABLED = {};
 
   function isEnabled(brandId, modelId) {
     return (ENABLED[brandId] || []).includes(modelId);
-  }
-  /* carros da garagem têm página acessível mesmo fora do catálogo */
-  function isVisible(brandId, modelId) {
-    return isEnabled(brandId, modelId) ||
-      (TS.garage || []).some((g) => g.brandId === brandId && g.modelId === modelId);
   }
   function enabledVehicles() {
     const out = [];
@@ -200,8 +195,9 @@
     const photo = opts.photo
       ? '<img class="model-photo" src="' + opts.photo + '" alt="' + esc(opts.name || m.name) + '"' + focus + ' loading="lazy" onerror="this.onerror=function(){this.remove()};this.removeAttribute(\'style\');this.src=\'' + stock + '\'"/>'
       : '<img class="model-photo" src="' + stock + '" alt="' + esc(m.name) + '" loading="lazy" onerror="this.remove()"/>';
+    const href = opts.href || "#/veiculo/" + brandId + "/" + m.id;
     return (
-      '<a class="card model-card" href="#/veiculo/' + brandId + "/" + m.id + '">' +
+      '<a class="card model-card" href="' + href + '">' +
       (opts.owner ? '<div class="owner-chip">' + esc(opts.owner) + "</div>" : "") +
       '<div class="model-art' + (opts.photo ? " model-art--tall" : "") + '">' + carSVG(m.hue, { glow: false }) +
       photo +
@@ -220,7 +216,7 @@
     const garage = (TS.garage || [])
       .map((g) => {
         const m = TS.mergedVehicle(g);
-        return m ? modelCard(g.brandId, m, { owner: g.owner, name: g.name, photo: TS.garagePhoto(g), focus: g.focus }) : "";
+        return m ? modelCard(g.brandId, m, { owner: g.owner, name: g.name, photo: TS.garagePhoto(g), focus: g.focus, href: "#/garagem/" + g.slug }) : "";
       })
       .join("");
 
@@ -263,20 +259,24 @@
      TODAS AS MARCAS
      ========================================================= */
   function renderBrands() {
-    const models = enabledVehicles()
-      .map(({ brandId, m }) => modelCard(brandId, m))
-      .join("");
+    const list = enabledVehicles();
+    const models = list.map(({ brandId, m }) => modelCard(brandId, m)).join("");
+    const body = list.length
+      ? '<div class="model-grid model-grid-solo">' + models + "</div>"
+      : '<div class="empty-state"><div class="empty-mark">' + carSVG(355, { glow: false }) + "</div>" +
+        "<h3>Catálogo em construção</h3>" +
+        "<p>Em breve vamos listar aqui modelos com recomendações de customização. Volte logo!</p></div>";
 
     app.innerHTML =
       navbar("marcas") +
       "<main>" +
       '<div class="page-head"><div class="container">' +
       '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><span>Modelos</span></div>' +
-      "<h1>Selecione o modelo</h1>" +
-      '<p class="sub">Estamos começando com um modelo — mais carros em breve.</p>' +
+      "<h1>Catálogo</h1>" +
+      '<p class="sub">Modelos com guias e recomendações de preparação.</p>' +
       "</div></div>" +
       '<section class="section" style="padding-top:44px"><div class="container">' +
-      '<div class="model-grid model-grid-solo">' + models + "</div>" +
+      body +
       "</div></section></main>" +
       footer();
   }
@@ -308,15 +308,19 @@
   /* =========================================================
      PÁGINA DO VEÍCULO
      ========================================================= */
-  function renderVehicle(brandId, modelId) {
+  function renderVehicle(brandId, modelId, gEntry) {
     const brand = TS.getBrand(brandId);
-    const gEntry = TS.garageEntry(brandId, modelId);
-    const vehicle = gEntry ? TS.mergedVehicle(gEntry) : TS.getVehicle(brandId, modelId);
-    if (!brand || !vehicle || !isVisible(brandId, modelId)) return renderNotFound();
+    const base = TS.getVehicle(brandId, modelId);
+    // garagem: sempre visível pela rota própria; catálogo: só se habilitado
+    const visible = gEntry ? true : isEnabled(brandId, modelId);
+    const vehicle = gEntry ? TS.mergedVehicle(gEntry) : base;
+    if (!brand || !vehicle || !visible) return renderNotFound();
     state.brandId = brandId;
 
     const title = gEntry ? gEntry.name : vehicle.name;
-    const meta = brand.name + " · " + vehicle.name + " · " + vehicle.year;
+    const meta = gEntry
+      ? brand.name + " · " + base.name + " · " + vehicle.year
+      : brand.name + " · " + vehicle.year;
     const photoSrc = gEntry ? TS.garagePhoto(gEntry) : TS.imgFor(brandId, vehicle);
     const photoStyle = gEntry && gEntry.focus ? ' style="object-position:' + gEntry.focus + '"' : "";
 
@@ -777,9 +781,15 @@
     if (parts.length === 0) return renderHome();
     if (parts[0] === "marcas") return renderBrands();
     if (parts[0] === "marca" && parts[1]) return renderBrand(parts[1]);
+    if (parts[0] === "garagem" && parts[1]) {
+      const g = TS.garageBySlug(parts[1]);
+      if (!g) return renderNotFound();
+      state.tab = "informacoes";
+      return renderVehicle(g.brandId, g.modelId, g);
+    }
     if (parts[0] === "veiculo" && parts[1] && parts[2]) {
       state.tab = "informacoes";
-      return renderVehicle(parts[1], parts[2]);
+      return renderVehicle(parts[1], parts[2], null);
     }
     renderNotFound();
   }
