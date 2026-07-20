@@ -169,7 +169,7 @@
       '<a href="#/" class="' + (active === "home" ? "active" : "") + '">Início</a>' +
       '<a href="#/marcas" class="' + (active === "marcas" ? "active" : "") + '">Modelos</a>' +
       '</nav>' +
-      '<button class="nav-cta" onclick="location.hash=\'' + mainVehicleHash() + '\'">Ver meu carro</button>' +
+      '<button class="nav-cta" onclick="location.hash=\'#/marcas\'">Ver modelos</button>' +
       "</div></header>"
     );
   }
@@ -232,7 +232,7 @@
       '<div class="hero-eyebrow"><span class="dot"></span>Catálogo inteligente · Preparação · Comunidade</div>' +
       "<h1>Tudo o que seu carro <em>pode se tornar.</em></h1>" +
       "<p>Encontre modificações, projetos, peças compatíveis e profissionais recomendados para o seu veículo.</p>" +
-      '<a class="btn btn-red" href="' + mainVehicleHash() + '">Ver meu carro ' +
+      '<a class="btn btn-red" href="#/marcas">Ver modelos ' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
       '<div class="hero-car">' +
       '<img class="hero-cutaway" src="' + heroImg() + '" alt="Cutaway técnico de um carro preparado com upgrades anotados" onerror="this.parentElement.classList.add(\'no-photo\');this.remove()"/>' +
