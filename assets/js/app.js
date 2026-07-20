@@ -203,7 +203,7 @@
     return (
       '<a class="card model-card" href="#/veiculo/' + brandId + "/" + m.id + '">' +
       (opts.owner ? '<div class="owner-chip">' + esc(opts.owner) + "</div>" : "") +
-      '<div class="model-art">' + carSVG(m.hue, { glow: false }) +
+      '<div class="model-art' + (opts.photo ? " model-art--tall" : "") + '">' + carSVG(m.hue, { glow: false }) +
       photo +
       "</div>" +
       '<div class="model-body"><h3>' + esc(opts.name || m.name) + "</h3>" +
@@ -331,9 +331,13 @@
       "</div>" +
       '<div class="fipe-chip"><span>Preço médio FIPE</span><b>' + vehicle.fipe + "</b></div>" +
       "</div>" +
-      '<div class="vehicle-art">' + carSVG(vehicle.hue) +
-      '<img class="vehicle-photo" src="' + photoSrc + '" alt="' + esc(title) + '"' + photoStyle + ' onerror="this.remove()"/>' +
-      "</div>" +
+      (gEntry
+        ? '<div class="vehicle-art vehicle-art--photo">' +
+          '<img class="vehicle-photo" src="' + photoSrc + '" alt="' + esc(title) + '" onerror="this.remove()"/>' +
+          "</div>"
+        : '<div class="vehicle-art">' + carSVG(vehicle.hue) +
+          '<img class="vehicle-photo" src="' + photoSrc + '" alt="' + esc(title) + '" onerror="this.remove()"/>' +
+          "</div>") +
       '<div class="spec-strip">' +
       "<div><b>" + vehicle.engine + "</b><span>Motor</span></div>" +
       "<div><b>" + vehicle.power + "</b><span>Potência</span></div>" +
@@ -430,6 +434,12 @@
       (v.mods
         ? '<div class="card info-card mods-card"><div class="ic">' + I.ecu + "</div>" +
           "<span>Preparação</span><b>" + esc(v.mods) + "</b></div>"
+        : "") +
+      (v.build && v.build.length
+        ? '<div class="build-block"><div class="kicker">Build & modificações</div>' +
+          '<div class="build-grid">' +
+          v.build.map((b) => '<div class="build-item">' + I.check + "<span>" + esc(b) + "</span></div>").join("") +
+          "</div></div>"
         : "")
     );
   }

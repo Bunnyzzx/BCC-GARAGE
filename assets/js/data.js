@@ -368,22 +368,66 @@ TS.getSeedPosts = function (vehicle) {
 TS.garage = [
   {
     owner: "Bryan", name: "bastblack_", brandId: "fiat", modelId: "fastback-abarth",
-    photo: "fastblack.webp", focus: "center 42%",
-    specs: { year: "2022/2023", power: "≈220 cv", torque: "31,5 kgfm", accel: "8,0 s",
+    photo: "fastblack.webp", focus: "center 44%",
+    specs: { year: "2022/2023", power: "≈220 cv (170 whp)", torque: "31,5 kgfm", accel: "8,0 s",
              consumption: "7 km/l cidade · 15 km/l rodovia (gasolina)" },
-    mods: "Fastback Limited Edition Powered by Abarth — 170 whp na roda. Piggyback: +30 whp e +4 kgfm sobre os 185 cv / 27,5 kgfm de fábrica.",
+    oil: "0W30",
+    mods: "Limited Edition Powered by Abarth · 170 whp na roda (piggyback +30 whp / +4 kgfm sobre os 185 cv e 27,5 kgfm de fábrica).",
+    build: [
+      "Downpipe com pintura cerâmica",
+      "Filtro Race Chrome",
+      "Piggyback BPower",
+      "Rodas Rodera Emotion 18x8.5",
+      "Adaptadores SG 15mm (5x98 → 5x100)",
+      "Pneus Itaro Sport 225/45 R18",
+      "Parachoque traseiro Abarth",
+      "Aerofólio Abarth",
+      "Escape duplo Abarth",
+      "Grade e emblema Abarth",
+      "Volante com emblema Abarth",
+      "Suspensão fixa Imperium Shocks",
+      "Som trio Pioneer 12\"",
+      "Abafador intermediário JK",
+      "Extensor de paddle shift",
+      "Insulfilm G25 na frente · G5 no restante",
+    ],
   },
   {
     owner: "Caio", name: "shiden_lancer", brandId: "mitsubishi", modelId: "lancer-gt",
-    photo: "lancer_shiden.webp", focus: "center 46%",
+    photo: "lancer_shiden.webp", focus: "center 48%",
     specs: { year: "2012", power: "≈180 cv", torque: "20,1 kgfm", accel: "8,6 s" },
+    build: [
+      "Bodykit full em ABS",
+      "Parachoque dianteiro Varis V2",
+      "Parachoque traseiro FQ400",
+      "Capô Evo X",
+      "Aerofólio Evo X",
+      "Faróis VLand Demon Eyes",
+      "Lanternas VLand",
+      "Rodas Volk TE37 18x9",
+      "Pneus Michelin PS5 235/45",
+      "Remap by MultiRemapped (multimapas)",
+      "FuelTech NanoPRO OBD2",
+      "Filtro K&N",
+      "Intake em inox dimensionado",
+      "Coletor 4-2-1 em inox dimensionado",
+    ],
   },
   {
     owner: "Cauã", name: "e36.bl0odymary", brandId: "bmw", modelId: "325i-e36",
-    photo: "bm_caua.PNG", focus: "center 62%",
+    photo: "bm_caua.PNG", focus: "center 55%",
     specs: { engine: "2.5 24V M50B25 (aspirado)", power: "182 hp (roda)", torque: "33 kgfm",
              accel: "7,0 s", gearbox: "Getrag manual 5 marchas" },
     oil: "5W40",
+    build: [
+      "Escapamento direto",
+      "Filtro esportivo genérico",
+      "Injeção FuelTech FT450 NanoPRO",
+      "Bobinas GM Onix 4 cilindros",
+      "Velas de irídio",
+      "Radiador de caminhão HR Hyundai",
+      "Spoiler Ducktail",
+    ],
   },
 ];
 
@@ -402,7 +446,7 @@ TS.garageEntry = function (brandId, modelId) {
 TS.mergedVehicle = function (g) {
   const base = TS.getVehicle(g.brandId, g.modelId);
   if (!base) return null;
-  return Object.assign({}, base, g.specs || {}, { oil: g.oil, mods: g.mods });
+  return Object.assign({}, base, g.specs || {}, { oil: g.oil, mods: g.mods, build: g.build });
 };
 
 /* ---------- Peças ----------
