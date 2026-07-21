@@ -375,19 +375,25 @@
 
   /* ---------- Aba Informações ---------- */
   function infoTab(v) {
+    const consumo = (v.cityKml || v.hwyKml)
+      ? [["fuel", "Consumo cidade", v.cityKml || "—"], ["fuel", "Consumo rodovia", v.hwyKml || "—"]]
+      : [["fuel", "Consumo", v.consumption]];
     const items = [
       ["engine", "Motor", v.engine],
       ["power", "Potência", v.power, true],
       ["torque", "Torque", v.torque],
       ["weight", "Peso", v.weight],
-      ["fuel", "Consumo", v.consumption],
+      ...consumo,
       ["accel", "0–100 km/h", v.accel, true],
       ["speed", "Velocidade máxima", v.top],
       ["gearbox", "Câmbio", v.gearbox],
       ["traction", "Tração", v.traction],
       ["price", "Preço FIPE", v.fipe],
     ];
-    if (v.oil) items.splice(8, 0, ["fuel", "Óleo", v.oil]);
+    if (v.oil) {
+      const gi = items.findIndex((it) => it[1] === "Câmbio");
+      items.splice(gi >= 0 ? gi + 1 : items.length, 0, ["fuel", "Óleo", v.oil]);
+    }
     return (
       '<div class="info-grid">' +
       items

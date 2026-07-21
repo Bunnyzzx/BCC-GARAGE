@@ -367,10 +367,10 @@ TS.getSeedPosts = function (vehicle) {
            não existir, o card usa a foto de banco do modelo. */
 TS.garage = [
   {
-    owner: "Bryan", name: "bastblack_", slug: "bastblack", brandId: "fiat", modelId: "fastback-abarth",
+    owner: "Bryan", name: "fastblack_", slug: "fastblack", brandId: "fiat", modelId: "fastback-abarth",
     photo: "fastblack.webp", focus: "center 44%",
     specs: { year: "2022/2023", power: "≈220 cv (170 whp)", torque: "31,5 kgfm", accel: "8,0 s",
-             consumption: "7 km/l cidade · 15 km/l rodovia (gasolina)" },
+             cityKml: "7 km/l", hwyKml: "15 km/l" },
     oil: "0W30",
     mods: "Limited Edition Powered by Abarth · 170 whp na roda (piggyback +30 whp / +4 kgfm sobre os 185 cv e 27,5 kgfm de fábrica).",
     build: [
@@ -395,7 +395,9 @@ TS.garage = [
   {
     owner: "Caio", name: "shiden_lancer", slug: "shiden", brandId: "mitsubishi", modelId: "lancer-gt",
     photo: "lancer_shiden.webp", focus: "center 48%",
-    specs: { year: "2012", power: "≈180 cv", torque: "20,1 kgfm", accel: "8,6 s" },
+    specs: { year: "2012", power: "≈180 cv", torque: "20,1 kgfm", accel: "8,6 s",
+             cityKml: "6–7 km/l", hwyKml: "10–12 km/l" },
+    mods: "Aspiração otimizada: coletor 4-2-1 dimensionado em inox, intake dimensionado e filtro K&N, com gerenciamento MultiRemapped (multimapas).",
     build: [
       "Bodykit full em ABS",
       "Parachoque dianteiro Varis V2",
@@ -417,7 +419,8 @@ TS.garage = [
     owner: "Cauã", name: "e36.bl0odymary", slug: "bloodymary", brandId: "bmw", modelId: "325i-e36",
     photo: "bm_caua.PNG", focus: "center 55%",
     specs: { engine: "2.5 24V M50B25 (aspirado)", power: "182 hp (roda)", torque: "33 kgfm",
-             accel: "7,0 s", gearbox: "Getrag manual 5 marchas" },
+             accel: "7,0 s", gearbox: "Getrag manual 5 marchas",
+             cityKml: "7–8 km/l", hwyKml: "10–11 km/l" },
     oil: "5W40",
     build: [
       "Escapamento direto",
