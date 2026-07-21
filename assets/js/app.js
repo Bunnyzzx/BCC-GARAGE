@@ -342,14 +342,7 @@
         : '<div class="vehicle-art">' + carSVG(vehicle.hue) +
           '<img class="vehicle-photo" src="' + photoSrc + '" alt="' + esc(title) + '" onerror="this.remove()"/>' +
           "</div>") +
-      '<div class="spec-strip">' +
-      "<div><b>" + vehicle.engine + "</b><span>Motor</span></div>" +
-      "<div><b>" + vehicle.power + "</b><span>Potência</span></div>" +
-      "<div><b>" + vehicle.torque + "</b><span>Torque</span></div>" +
-      "<div><b>" + vehicle.accel + "</b><span>0–100 km/h</span></div>" +
-      "<div><b>" + vehicle.gearbox.split(" ").slice(0, 2).join(" ") + "</b><span>Câmbio</span></div>" +
-      "<div><b>" + vehicle.year + "</b><span>Ano</span></div>" +
-      "</div></div></section>" +
+      "</div></section>" +
 
       '<div class="container">' +
       '<section class="v-section">' + infoTab(vehicle) + "</section>" +
@@ -396,9 +389,6 @@
     ];
     if (v.oil) items.splice(8, 0, ["fuel", "Óleo", v.oil]);
     return (
-      '<div class="section-head"><div><div class="kicker">Ficha técnica</div>' +
-      "<h2>Especificações do " + esc(v.name) + "</h2>" +
-      "<p>Os números que realmente importam, direto ao ponto.</p></div></div>" +
       '<div class="info-grid">' +
       items
         .map(
