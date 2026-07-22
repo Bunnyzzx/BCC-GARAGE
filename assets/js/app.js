@@ -1208,6 +1208,28 @@
       "</div></div>" +
 
       '<div class="card calc-card">' +
+      '<div class="section-head" style="margin-bottom:20px"><div><div class="kicker">Desempenho</div>' +
+      "<h2>Peso / Potência</h2><p>A relação que mais influencia a aceleração. Quanto menor o kg/cv, mais rápido o carro.</p></div></div>" +
+      '<div class="calc-tool">' +
+      '<label>Peso do carro (kg)<input type="number" id="pw-weight" placeholder="Ex: 1.200"/></label>' +
+      '<label>Potência (cv)<input type="number" id="pw-power" placeholder="Ex: 180"/></label>' +
+      '<div class="calc-result" id="pw-result">Preencha peso e potência.</div>' +
+      "</div></div>" +
+
+      '<div class="card calc-card calc-card--wide">' +
+      '<div class="section-head" style="margin-bottom:20px"><div><div class="kicker">Viagem</div>' +
+      "<h2>Planejador de viagem</h2><p>Combustível, custo, tempo e divisão entre passageiros — ida e ida-e-volta, tudo de uma vez.</p></div></div>" +
+      '<div class="calc-tool calc-tool--trip">' +
+      '<label>Distância só ida (km)<input type="number" id="trip-dist" placeholder="Ex: 320"/></label>' +
+      '<label>Consumo (km/l)<input type="number" step="0.1" id="trip-kml" placeholder="Ex: 12"/></label>' +
+      '<label>Preço do litro (R$)<input type="number" step="0.01" id="trip-price" placeholder="Ex: 5,89"/></label>' +
+      '<label>Velocidade média (km/h)<input type="number" id="trip-speed" placeholder="Opcional · ex: 90"/></label>' +
+      '<label>Passageiros<input type="number" id="trip-pax" placeholder="Opcional · ex: 4"/></label>' +
+      "</div>" +
+      '<div class="trip-results" id="trip-results"><div class="trip-empty">Preencha distância, consumo e preço para calcular.</div></div>' +
+      "</div>" +
+
+      '<div class="card calc-card">' +
       '<div class="section-head" style="margin-bottom:20px"><div><div class="kicker">Fitment</div>' +
       "<h2>Calculadora de pneus</h2><p>Compare a medida original com uma nova e veja a diferença de diâmetro e de velocímetro.</p></div></div>" +
       '<div class="calc-tool calc-tool--tire">' +
@@ -1301,6 +1323,44 @@
       fuelResult.innerHTML = "Consumo: <b>" + kml.toFixed(1) + " km/l</b>" + extra;
     }
     if (kmEl && litersEl && fuelResult) [kmEl, litersEl, fuelPriceEl].forEach((el) => el.addEventListener("input", updateFuel));
+
+    const gid = (x) => document.getElementById(x);
+
+    /* Peso / potência */
+    const pwW = gid("pw-weight"), pwP = gid("pw-power"), pwR = gid("pw-result");
+    function updatePW() {
+      const w = parseNum(pwW.value), p = parseNum(pwP.value);
+      if (!w || !p) { pwR.textContent = "Preencha peso e potência."; return; }
+      const kgcv = w / p;
+      const cat = kgcv < 4 ? "Extremo — nível pista"
+        : kgcv < 6 ? "Esportivo"
+        : kgcv < 8 ? "Muito ágil"
+        : kgcv < 11 ? "Equilibrado" : "Urbano / passeio";
+      pwR.innerHTML = "Relação: <b>" + kgcv.toFixed(1) + " kg/cv</b> <span>" + cat + "</span>";
+    }
+    if (pwW && pwP && pwR) [pwW, pwP].forEach((el) => el.addEventListener("input", updatePW));
+
+    /* Planejador de viagem */
+    const tD = gid("trip-dist"), tK = gid("trip-kml"), tP = gid("trip-price"), tS = gid("trip-speed"), tX = gid("trip-pax"), tR = gid("trip-results");
+    const brl = (n) => "R$ " + n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const tile = (label, val) => '<div class="trip-tile"><span>' + label + "</span><b>" + val + "</b></div>";
+    function updateTrip() {
+      const d = parseNum(tD.value), k = parseNum(tK.value), p = parseNum(tP.value);
+      if (!d || !k || !p) { tR.innerHTML = '<div class="trip-empty">Preencha distância, consumo e preço para calcular.</div>'; return; }
+      const litersOne = d / k, costOne = litersOne * p;
+      let tiles = tile("Combustível (ida)", litersOne.toFixed(1) + " L") +
+        tile("Custo (ida)", brl(costOne)) +
+        tile("Ida e volta", (litersOne * 2).toFixed(1) + " L · " + brl(costOne * 2));
+      const spd = parseNum(tS && tS.value);
+      if (spd > 0) {
+        const h = d / spd, hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+        tiles += tile("Tempo (ida)", hh + "h" + (mm ? " " + mm + "min" : ""));
+      }
+      const pax = parseInt(tX && tX.value, 10);
+      if (pax > 0) tiles += tile("Por passageiro (ida e volta)", brl((costOne * 2) / pax));
+      tR.innerHTML = tiles;
+    }
+    if (tD && tK && tP && tR) [tD, tK, tP, tS, tX].forEach((el) => el && el.addEventListener("input", updateTrip));
   }
 
   /* =========================================================

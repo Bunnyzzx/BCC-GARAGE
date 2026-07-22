@@ -1263,6 +1263,14 @@ main { padding-bottom: 84px; } /* espaço pro CTA fixo não cobrir o rodapé */
 .calc-result { margin-top: 4px; padding: 16px; background: var(--surface-2); border-radius: var(--radius-sm); font-size: 14.5px; color: var(--text-2); }
 .calc-result b { color: var(--text); font-size: 17px; }
 .calc-result span { display: block; font-size: 11.5px; color: var(--text-3); margin-top: 4px; }
+/* card largo (planejador de viagem) ocupa a linha toda do grid */
+.calc-card--wide { grid-column: 1 / -1; }
+.calc-tool--trip { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+.trip-results { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.trip-empty { grid-column: 1 / -1; padding: 16px; background: var(--surface-2); border-radius: var(--radius-sm); font-size: 14px; color: var(--text-3); }
+.trip-tile { padding: 16px 18px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.trip-tile span { display: block; font-size: 11.5px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 6px; }
+.trip-tile b { font-size: 19px; letter-spacing: -0.02em; }
 
 /* ---------- Rodapé: disclosure de afiliado ---------- */
 .affiliate-disclosure { font-size: 12px; line-height: 1.6; color: var(--text-3); max-width: 760px; margin: 28px 0 0; padding-top: 24px; border-top: 1px solid var(--border); }
