@@ -834,7 +834,10 @@
       (I[p.icon] || I.gauge) +
       "</div>" +
       '<div class="mp-body">' +
+      '<div class="mp-meta-row">' +
+      (p.brand ? '<span class="mp-brand-chip">' + esc(p.brand) + "</span>" : "") +
       (catName ? '<span class="mp-cat-chip">' + esc(catName) + "</span>" : "") +
+      "</div>" +
       "<h4 class=\"mp-title\">" + esc(p.name) + "</h4>" +
       (opts.showDesc && p.desc ? '<p class="mp-desc">' + esc(p.desc) + "</p>" : "") +
       '<a class="mp-cta mp-cta--' + net.id + '" href="' + esc(href) + '" target="_blank" rel="sponsored nofollow noopener" ' +
