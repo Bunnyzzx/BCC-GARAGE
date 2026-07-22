@@ -447,11 +447,15 @@
     const catOptions = TS.productCategories
       .map((c) => '<option value="' + c.id + '">' + esc(c.name) + "</option>")
       .join("");
-    const catChips = ['<button class="cat-chip' + (productsState.category === "all" ? " active" : "") + '" data-cat="all">Todas</button>']
-      .concat(
-        TS.productCategories.map(
-          (c) => '<button class="cat-chip' + (productsState.category === c.id ? " active" : "") + '" data-cat="' + c.id + '">' + esc(c.name) + "</button>"
-        )
+    const CAT_ICON = { all: "gauge", cleaning: "bodykit", performance: "turbo", maintenance: "piston",
+      tools: "gearbox", lighting: "headlight", tires: "wheel", interior: "seat", audio: "speaker",
+      electronics: "camera", accessories: "gauge" };
+    const catCards = [{ id: "all", name: "Todas" }].concat(TS.productCategories)
+      .map(
+        (c) =>
+          '<button class="cat-filter-card' + (productsState.category === c.id ? " active" : "") + '" data-cat="' + c.id + '">' +
+          '<span class="cat-filter-ic">' + (I[CAT_ICON[c.id]] || I.gauge) + "</span>" +
+          '<span class="cat-filter-name">' + esc(c.name) + "</span></button>"
       )
       .join("");
 
@@ -479,7 +483,7 @@
       '<button class="view-btn' + (productsState.view === "list" ? " active" : "") + '" data-view="list" aria-label="Lista">' + I.gearbox + "</button>" +
       "</div></div>" +
 
-      '<div class="cat-chips">' + catChips + "</div>" +
+      '<div class="cat-filter-grid">' + catCards + "</div>" +
 
       '<div id="products-grid" class="mp-grid"></div>' +
       '<div id="products-pagination" class="pagination"></div>' +
@@ -517,9 +521,10 @@
     const start = (productsState.page - 1) * productsState.perPage;
     const pageItems = list.slice(start, start + productsState.perPage);
 
-    grid.className = productsState.view === "list" ? "mp-list" : "mp-grid";
+    const isList = productsState.view === "list";
+    grid.className = isList ? "mp-list" : "mp-grid";
     grid.innerHTML = pageItems.length
-      ? pageItems.map((p) => productCard(p, { showCategory: true })).join("")
+      ? pageItems.map((p) => productCard(p, { showCategory: true, showDesc: isList })).join("")
       : '<div class="card" style="padding:32px;text-align:center;grid-column:1/-1"><p>Nenhum produto encontrado para esse filtro.</p></div>';
 
     if (pag) {
@@ -540,11 +545,11 @@
     if (search) search.addEventListener("input", () => { productsState.query = search.value; productsState.page = 1; renderProductsGrid(); });
     if (sort) { sort.value = productsState.sort; sort.addEventListener("change", () => { productsState.sort = sort.value; renderProductsGrid(); }); }
 
-    document.querySelectorAll(".cat-chip").forEach((btn) =>
+    document.querySelectorAll(".cat-filter-card").forEach((btn) =>
       btn.addEventListener("click", () => {
         productsState.category = btn.dataset.cat;
         productsState.page = 1;
-        document.querySelectorAll(".cat-chip").forEach((b) => b.classList.toggle("active", b === btn));
+        document.querySelectorAll(".cat-filter-card").forEach((b) => b.classList.toggle("active", b === btn));
         renderProductsGrid();
       })
     );
@@ -831,6 +836,7 @@
       '<div class="mp-body">' +
       (catName ? '<span class="mp-cat-chip">' + esc(catName) + "</span>" : "") +
       "<h4 class=\"mp-title\">" + esc(p.name) + "</h4>" +
+      (opts.showDesc && p.desc ? '<p class="mp-desc">' + esc(p.desc) + "</p>" : "") +
       '<a class="mp-cta mp-cta--' + net.id + '" href="' + esc(href) + '" target="_blank" rel="sponsored nofollow noopener" ' +
       'data-part="' + esc(p.name) + '" data-network="' + net.id + '">' +
       "Ver na " + net.short + " " + I.external + "</a>" +
