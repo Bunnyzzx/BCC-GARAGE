@@ -1,9 +1,15 @@
 /* =========================================================
-   BCC Garage — App (roteador hash + views)
+   TuneSpec — App (roteador hash + views)
    ========================================================= */
 
 (function () {
   const app = document.getElementById("app");
+
+  /* ---------- Marca ----------
+     Ponto único de verdade da marca. Trocar a logo = trocar o arquivo
+     em assets/img/logo.png (mesma proporção) — nada mais precisa mudar. */
+  const BRAND_NAME = "TuneSpec";
+  const LOGO_SRC = "assets/img/logo.png";
 
   /* ---------- Ícones (SVG inline, stroke minimalista) ---------- */
   const I = {
@@ -43,6 +49,9 @@
     saveFill:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>',
     photo:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m5 19 6-6 4 4 2-2 4 4"/></svg>',
     external:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4 10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>',
+    speaker:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="8" r="2.2"/><circle cx="12" cy="15.5" r="3.2"/></svg>',
+    camera:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+    scale:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 7l-4 8a4 4 0 0 0 8 0zM17 7l-4 8a4 4 0 0 0 8 0zM5 7h14"/></svg>',
     instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6" fill="currentColor"/></svg>',
     whatsapp:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5a8 8 0 0 1-11.6 7.2L4 20l1.3-4.2A8 8 0 1 1 20 11.5z"/><path d="M9 9.5c0 4 5.5 5.5 5.5 5.5l1-1.5-2-1.5-1 .8c-1-.5-1.8-1.3-2.2-2.3l.7-1L9.5 8z"/></svg>',
     globe:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 4 5.7 4 9s-1.5 6.4-4 9c-2.5-2.6-4-5.7-4-9s1.5-6.4 4-9z"/></svg>',
@@ -103,9 +112,9 @@
 
   /* ---------- Estado ---------- */
   const state = {
-    tab: "informacoes",
-    upgradeCat: "performance",
+    tab: "performance",
     aestheticCat: "farois",
+    currentVehicle: null,
   };
 
   function storeKey(vehicleId) { return "tunespec-community-" + vehicleId; }
@@ -135,17 +144,25 @@
   }
 
   /* ---------- Catálogo visível no MVP ----------
-     Os dados completos (todas as marcas/modelos) continuam em data.js
-     e as fotos em assets/img/vehicles/ — aqui só se define o que a UI mostra. */
-  const ENABLED = {};
+     Lançamento: todo veículo presente em TS.models (data.js) entra no catálogo
+     por padrão — são os 52 veículos com ficha técnica e foto reais.
+     Para tirar um veículo específico do ar temporariamente (ex.: faltando
+     revisão de dados), adicione "marca:id-do-modelo" em DRAFT_IDS abaixo.
+     Não é preciso mexer em data.js para isso. */
+  const DRAFT_IDS = new Set([
+    // "chevrolet:camaro-ss",
+  ]);
 
   function isEnabled(brandId, modelId) {
-    return (ENABLED[brandId] || []).includes(modelId);
+    const models = TS.models[brandId] || [];
+    const exists = models.some((m) => m.id === modelId);
+    if (!exists) return false;
+    return !DRAFT_IDS.has(brandId + ":" + modelId);
   }
   function enabledVehicles() {
     const out = [];
-    for (const brandId of Object.keys(ENABLED)) {
-      for (const m of TS.models[brandId] || []) {
+    for (const brandId of Object.keys(TS.models)) {
+      for (const m of TS.models[brandId]) {
         if (isEnabled(brandId, m.id)) out.push({ brandId, m });
       }
     }
@@ -153,34 +170,110 @@
   }
   function mainVehicleHash() {
     const v = enabledVehicles()[0];
-    return v ? "#/veiculo/" + v.brandId + "/" + v.m.id : "#/marcas";
+    return v ? "#/veiculo/" + v.brandId + "/" + v.m.id : "#/models";
   }
 
   function navbar(active) {
     return (
       '<header class="nav"><div class="container nav-inner">' +
-      '<a class="logo" href="#/"><span class="logo-bcc">BCC</span><span class="logo-garage">GARAGE</span></a>' +
+      '<a class="logo" href="#/" aria-label="' + BRAND_NAME + '">' +
+      '<img src="' + LOGO_SRC + '" alt="' + BRAND_NAME + '" class="logo-img" ' +
+      'onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'logo-fallback\',textContent:\'' + BRAND_NAME + '\'}))"/>' +
+      "</a>" +
       '<nav class="nav-links">' +
-      '<a href="#/" class="' + (active === "home" ? "active" : "") + '">Início</a>' +
-      '<a href="#/marcas" class="' + (active === "marcas" ? "active" : "") + '">Modelos</a>' +
-      '</nav>' +
-      '<button class="nav-cta" onclick="location.hash=\'#/marcas\'">Ver modelos</button>' +
+      '<a href="#/" class="' + (active === "home" ? "active" : "") + '">Home</a>' +
+      '<a href="#/models" class="' + (active === "models" ? "active" : "") + '">Models</a>' +
+      '<a href="#/products" class="' + (active === "products" ? "active" : "") + '">Products</a>' +
+      '<a href="#/blog" class="' + (active === "blog" ? "active" : "") + '">Blog</a>' +
+      '<a href="#/tools" class="' + (active === "tools" ? "active" : "") + '">Tools</a>' +
+      "</nav>" +
+      '<div class="nav-search">' +
+      '<input type="search" id="global-search" class="nav-search-input" placeholder="Buscar seu carro…" autocomplete="off" aria-label="Buscar veículo"/>' +
+      '<div id="search-dropdown" class="search-dropdown" hidden></div>' +
+      "</div>" +
+      '<button class="nav-cta" onclick="location.hash=\'#/models\'">Ver modelos</button>' +
       "</div></header>"
     );
+  }
+
+  /* ---------- Busca global de veículos ---------- */
+  let searchIndexCache = null;
+  function searchIndex() {
+    if (searchIndexCache) return searchIndexCache;
+    const out = [];
+    for (const brandId of Object.keys(TS.models)) {
+      const brand = TS.getBrand(brandId);
+      for (const m of TS.models[brandId]) {
+        if (!isEnabled(brandId, m.id)) continue;
+        out.push({ brandId, brandName: brand ? brand.name : brandId, m, label: (brand ? brand.name : brandId) + " " + m.name });
+      }
+    }
+    searchIndexCache = out;
+    return out;
+  }
+  let globalSearchClickBound = false;
+  function bindGlobalSearch(inputId, ddId) {
+    inputId = inputId || "global-search";
+    ddId = ddId || "search-dropdown";
+    const input = document.getElementById(inputId);
+    const dd = document.getElementById(ddId);
+    if (!input || !dd) return;
+    if (!globalSearchClickBound) {
+      globalSearchClickBound = true;
+      document.addEventListener("click", (e) => {
+        document.querySelectorAll(".search-dropdown").forEach((curDd) => {
+          const curInput = document.getElementById(curDd.id === "search-dropdown" ? "global-search" : "home-search");
+          if (!curDd.hidden && !curDd.contains(e.target) && e.target !== curInput) curDd.hidden = true;
+        });
+      });
+    }
+    function renderResults(q) {
+      const term = q.trim().toLowerCase();
+      if (!term) { dd.hidden = true; dd.innerHTML = ""; return; }
+      const hits = searchIndex()
+        .filter((e) => e.label.toLowerCase().includes(term))
+        .slice(0, 7);
+      if (!hits.length) {
+        dd.innerHTML = '<div class="search-empty">Nenhum veículo encontrado para "' + esc(q) + '"</div>';
+        dd.hidden = false;
+        return;
+      }
+      dd.innerHTML = hits
+        .map(
+          (e) =>
+            '<a class="search-item" href="#/veiculo/' + e.brandId + "/" + e.m.id + '">' +
+            '<span class="search-item-thumb">' + carSVG(e.m.hue, { glow: false }) + "</span>" +
+            '<span class="search-item-text"><b>' + esc(e.m.name) + "</b><span>" + esc(e.brandName) + " · " + e.m.year + "</span></span>" +
+            "</a>"
+        )
+        .join("");
+      dd.hidden = false;
+    }
+    input.addEventListener("input", () => renderResults(input.value));
+    input.addEventListener("focus", () => { if (input.value) renderResults(input.value); });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { dd.hidden = true; input.blur(); }
+      if (e.key === "Enter") {
+        const first = dd.querySelector(".search-item");
+        if (first) { location.hash = first.getAttribute("href").replace("#", ""); dd.hidden = true; }
+      }
+    });
+    dd.addEventListener("click", () => { dd.hidden = true; input.blur(); });
   }
 
   function footer() {
     return (
       "<footer><div class='container'>" +
       "<div class='footer-inner'>" +
-      "<div><a class='logo' href='#/'><span class='logo-bcc'>BCC</span><span class='logo-garage'>GARAGE</span></a>" +
-      "<p>A plataforma definitiva para quem quer entender, modificar e evoluir o próprio carro — com informação confiável, peças compatíveis e profissionais recomendados.</p></div>" +
+      "<div><a class='logo' href='#/'><img src='" + LOGO_SRC + "' alt='" + BRAND_NAME + "' class='logo-img'/></a>" +
+      "<p>A plataforma definitiva para quem quer entender, modificar e evoluir o próprio carro — com informação confiável e as melhores ofertas de parceiros.</p></div>" +
       "<div class='footer-links'>" +
-      "<div><h5>Plataforma</h5><a href='#/marcas'>Modelos</a><a href='#/marcas'>Upgrades</a></div>" +
-      "<div><h5>Comunidade</h5><a href='#/marcas'>Posts</a><a href='#/marcas'>Profissionais</a></div>" +
+      "<div><h5>Plataforma</h5><a href='#/models'>Models</a><a href='#/products'>Products</a><a href='#/tools'>Tools</a></div>" +
+      "<div><h5>Conteúdo</h5><a href='#/blog'>Blog</a></div>" +
       "<div><h5>Empresa</h5><a href='#/'>Sobre</a><a href='#/'>Contato</a><a href='#/'>Termos</a></div>" +
       "</div></div>" +
-      "<div class='footer-bottom'><span>© 2026 BCC Garage. Todos os direitos reservados.</span><span>Feito para entusiastas.</span></div>" +
+      "<p class='trust-note'>Alguns produtos desta página são oferecidos por lojas parceiras (Mercado Livre, Shopee).</p>" +
+      "<div class='footer-bottom'><span>© 2026 " + BRAND_NAME + ". Todos os direitos reservados.</span><span>Feito para entusiastas.</span></div>" +
       "</div></footer>"
     );
   }
@@ -220,27 +313,55 @@
       })
       .join("");
 
+    const bestSellers = TS.productsCatalog.slice(0, 5);
+    const topDeals = TS.productsCatalog.slice(5, 10);
+
     app.innerHTML =
       navbar("home") +
       "<main>" +
-      '<section class="hero"><div class="hero-bg"><div class="hero-grid"></div></div>' +
-      '<div class="container hero-inner">' +
-      '<div class="hero-eyebrow"><span class="dot"></span>Catálogo inteligente · Preparação · Comunidade</div>' +
-      "<h1>Tudo o que seu carro <em>pode se tornar.</em></h1>" +
-      "<p>Encontre modificações, projetos, peças compatíveis e profissionais recomendados para o seu veículo.</p>" +
-      '<a class="btn btn-red" href="#/marcas">Ver modelos ' +
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
-      '<div class="hero-car">' +
-      '<img class="hero-cutaway" src="' + heroImg() + '" alt="Cutaway técnico de um carro preparado com upgrades anotados" onerror="this.parentElement.classList.add(\'no-photo\');this.remove()"/>' +
-      carSVG(355) + "</div>" +
+
+      /* ---------- HERO centralizado: só headline + subtexto + busca + CTA ---------- */
+      '<section class="hero hero--centered"><div class="hero-bg"><div class="hero-grid"></div></div>' +
+      '<div class="container hero-inner hero-inner--centered">' +
+      '<div class="hero-eyebrow"><span class="dot"></span>Catálogo · Preparação · Marketplace</div>' +
+      "<h1>O que você dirige?</h1>" +
+      "<p>Encontre modificações, peças compatíveis e as melhores ofertas para o seu carro.</p>" +
+      '<div class="hero-search"><span class="hero-search-icon">' + I.gauge + "</span>" +
+      '<input type="search" id="home-search" placeholder="Digite marca ou modelo — ex: Gol, Civic, Onix…" autocomplete="off"/>' +
+      '<div id="home-search-dropdown" class="search-dropdown search-dropdown--hero" hidden></div>' +
+      "</div>" +
+      '<a class="btn btn-red btn-lg hero-cta" href="#/models">Explorar modelos ' +
+      '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
+      "</div></section>" +
+
+      '<section class="trust-strip"><div class="container trust-strip-inner">' +
+      '<div class="trust-item">' + I.check + "<b>" + enabledVehicles().length + "</b><span>veículos mapeados</span></div>" +
+      '<div class="trust-item">' + I.check + "<b>" + TS.brands.length + "</b><span>marcas no catálogo</span></div>" +
+      '<div class="trust-item trust-item--badges"><span>Ofertas de</span>' +
+      '<span class="mp-badge mp-badge--mercadolivre mp-badge--sm">Mercado Livre</span>' +
+      '<span class="mp-badge mp-badge--shopee mp-badge--sm">Shopee</span></div>' +
+      "</div></section>" +
+
+      /* ---------- Mais vendidos ---------- */
+      '<section class="section"><div class="container">' +
+      '<div class="section-head"><div><div class="kicker">Populares</div>' +
+      "<h2>Mais vendidos</h2><p>Os itens que mais saem entre os nossos parceiros.</p></div>" +
+      '<a class="btn btn-ghost btn-sm" href="#/products">Ver todos</a></div>' +
+      '<div class="mp-grid">' + bestSellers.map((p) => productCard(p)).join("") + "</div>" +
+      "</div></section>" +
+
+      /* ---------- Ofertas em destaque ---------- */
+      '<section class="section" style="padding-top:0"><div class="container">' +
+      '<div class="section-head"><div><div class="kicker">Selecionados</div>' +
+      "<h2>Ofertas em destaque</h2><p>Uma seleção diferente, direto dos nossos parceiros.</p></div>" +
+      '<a class="btn btn-ghost btn-sm" href="#/products">Ver todos</a></div>' +
+      '<div class="mp-grid">' + topDeals.map((p) => productCard(p)).join("") + "</div>" +
       "</div></section>" +
 
       '<section class="section"><div class="container">' +
       '<div class="section-head"><div><div class="kicker">A equipe</div>' +
-      "<h2>Nossa garagem</h2><p>Os carros de quem faz o BCC Garage acontecer.</p></div></div>" +
+      "<h2>Nossa garagem</h2><p>Os carros de quem faz o " + BRAND_NAME + " acontecer.</p></div></div>" +
       '<div class="model-grid model-grid-solo">' + garage + "</div>" +
-      '<div class="garage-more"><a class="btn btn-ghost" href="#/marcas">Ver modelos ' +
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>' +
       "</div></section>" +
 
       '<section class="section" style="padding-top:0"><div class="container">' +
@@ -248,41 +369,53 @@
       "<h2>Do carro original ao projeto ideal</h2></div></div>" +
       '<div class="steps">' +
       '<div class="card step"><div class="step-num">01</div><h3>Escolha seu carro</h3><p>Selecione marca e modelo. A plataforma carrega as especificações completas do seu veículo.</p></div>' +
-      '<div class="card step"><div class="step-num">02</div><h3>Monte seu projeto</h3><p>Explore Stages de preparação e upgrades estéticos com peças compatíveis, preços reais e nível de dificuldade.</p></div>' +
-      '<div class="card step"><div class="step-num">03</div><h3>Execute com confiança</h3><p>Encontre profissionais avaliados pela comunidade e aprenda com quem já fez o mesmo projeto.</p></div>' +
+      '<div class="card step"><div class="step-num">02</div><h3>Monte seu projeto</h3><p>Explore Stages de preparação e upgrades estéticos, ou use o <a href="#/tools/planejador">Planejador de Build</a> para gerar um projeto por objetivo e orçamento.</p></div>' +
+      '<div class="card step"><div class="step-num">03</div><h3>Compre com confiança</h3><p>Cada peça leva direto à oferta real no Mercado Livre ou Shopee — sem intermediário.</p></div>' +
       "</div></div></section>" +
       "</main>" +
       footer();
+
+    bindGlobalSearch("home-search", "home-search-dropdown");
   }
 
   /* =========================================================
-     TODAS AS MARCAS
+     /models — catálogo de marcas (passo 1 do fluxo Brand → Models → Vehicle)
      ========================================================= */
-  function renderBrands() {
-    const list = enabledVehicles();
-    const models = list.map(({ brandId, m }) => modelCard(brandId, m)).join("");
-    const body = list.length
-      ? '<div class="model-grid model-grid-solo">' + models + "</div>"
-      : '<div class="empty-state"><div class="empty-mark">' + carSVG(355, { glow: false }) + "</div>" +
-        "<h3>Catálogo em construção</h3>" +
-        "<p>Em breve vamos listar aqui modelos com recomendações de customização. Volte logo!</p></div>";
+  function renderModels() {
+    const brandIds = Object.keys(TS.models)
+      .filter((id) => (TS.models[id] || []).some((m) => isEnabled(id, m.id)))
+      .sort((a, b) => (TS.getBrand(a).name || a).localeCompare(TS.getBrand(b).name || b));
+
+    const brandCards = brandIds
+      .map((brandId) => {
+        const brand = TS.getBrand(brandId);
+        const n = (TS.models[brandId] || []).filter((m) => isEnabled(brandId, m.id)).length;
+        return (
+          '<a class="brand-card" href="#/models/' + brandId + '">' +
+          '<div class="brand-card-mono">' + esc(brand.mono) + "</div>" +
+          "<h3>" + esc(brand.name) + "</h3>" +
+          '<span class="brand-card-count">' + n + " modelo" + (n === 1 ? "" : "s") + "</span>" +
+          "</a>"
+        );
+      })
+      .join("");
 
     app.innerHTML =
-      navbar("marcas") +
+      navbar("models") +
       "<main>" +
       '<div class="page-head"><div class="container">' +
-      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><span>Modelos</span></div>' +
-      "<h1>Catálogo</h1>" +
-      '<p class="sub">Modelos com guias e recomendações de preparação.</p>' +
+      '<div class="breadcrumb"><a href="#/">Home</a><span class="sep">/</span><span>Models</span></div>' +
+      "<h1>Escolha a marca do seu carro</h1>" +
+      '<p class="sub">' + brandIds.length + " marcas, de clássicos populares a esportivos importados. Selecione uma para ver os modelos.</p>" +
       "</div></div>" +
       '<section class="section" style="padding-top:44px"><div class="container">' +
-      body +
+      '<div class="brand-catalog">' + brandCards + "</div>" +
       "</div></section></main>" +
       footer();
   }
 
   /* =========================================================
-     PÁGINA DA MARCA
+     PÁGINA DA MARCA (passo 2: modelos de uma marca)
      ========================================================= */
   function renderBrand(brandId) {
     const brand = TS.getBrand(brandId);
@@ -292,10 +425,10 @@
     const cards = models.map((m) => modelCard(brandId, m)).join("");
 
     app.innerHTML =
-      navbar("marcas") +
+      navbar("models") +
       "<main>" +
       '<div class="page-head"><div class="container">' +
-      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><a href="#/marcas">Modelos</a><span class="sep">/</span><span>' + brand.name + "</span></div>" +
+      '<div class="breadcrumb"><a href="#/">Home</a><span class="sep">/</span><a href="#/models">Models</a><span class="sep">/</span><span>' + brand.name + "</span></div>" +
       "<h1>" + brand.name + "</h1>" +
       '<p class="sub">' + models.length + " modelo(s) mapeado(s) · Selecione o seu para ver specs, upgrades e comunidade.</p>" +
       "</div></div>" +
@@ -303,6 +436,136 @@
       '<div class="model-grid model-grid-solo">' + cards + "</div>" +
       "</div></section></main>" +
       footer();
+  }
+
+  /* =========================================================
+     /products — catálogo de produtos afiliados
+     ========================================================= */
+  const productsState = { query: "", category: "all", view: "grid", sort: "relevance", page: 1, perPage: 8 };
+
+  function renderProducts() {
+    const catOptions = TS.productCategories
+      .map((c) => '<option value="' + c.id + '">' + esc(c.name) + "</option>")
+      .join("");
+    const catChips = ['<button class="cat-chip' + (productsState.category === "all" ? " active" : "") + '" data-cat="all">Todas</button>']
+      .concat(
+        TS.productCategories.map(
+          (c) => '<button class="cat-chip' + (productsState.category === c.id ? " active" : "") + '" data-cat="' + c.id + '">' + esc(c.name) + "</button>"
+        )
+      )
+      .join("");
+
+    app.innerHTML =
+      navbar("products") +
+      "<main>" +
+      '<div class="page-head"><div class="container">' +
+      '<div class="breadcrumb"><a href="#/">Home</a><span class="sep">/</span><span>Products</span></div>' +
+      "<h1>Produtos</h1>" +
+      '<p class="sub">' + TS.productsCatalog.length + " produtos de parceiros — filtre por categoria ou busque pelo nome.</p>" +
+      "</div></div>" +
+      '<section class="section" style="padding-top:36px"><div class="container">' +
+
+      '<div class="products-toolbar">' +
+      '<div class="products-search"><span class="hero-search-icon">' + I.gauge + "</span>" +
+      '<input type="search" id="products-search" placeholder="Buscar produto…" autocomplete="off" value="' + esc(productsState.query) + '"/></div>' +
+      '<select id="products-sort" class="products-sort">' +
+      '<option value="relevance">Relevância</option>' +
+      '<option value="name-asc">Nome (A–Z)</option>' +
+      '<option value="name-desc">Nome (Z–A)</option>' +
+      '<option value="category">Categoria</option>' +
+      "</select>" +
+      '<div class="products-view-toggle">' +
+      '<button class="view-btn' + (productsState.view === "grid" ? " active" : "") + '" data-view="grid" aria-label="Grade">' + I.gauge + "</button>" +
+      '<button class="view-btn' + (productsState.view === "list" ? " active" : "") + '" data-view="list" aria-label="Lista">' + I.gearbox + "</button>" +
+      "</div></div>" +
+
+      '<div class="cat-chips">' + catChips + "</div>" +
+
+      '<div id="products-grid" class="mp-grid"></div>' +
+      '<div id="products-pagination" class="pagination"></div>' +
+
+      '<div class="products-related-guides"><div class="kicker">Guias relacionados</div>' +
+      '<div class="guide-related-list">' +
+      TS.articles.slice(0, 3).map((a) => '<a href="#/blog/' + a.slug + '">' + esc(a.title) + " " + I.accel + "</a>").join("") +
+      "</div></div>" +
+      "</div></section></main>" +
+      footer();
+
+    bindProducts();
+  }
+
+  function filteredSortedProducts() {
+    const q = productsState.query.trim().toLowerCase();
+    let list = TS.productsCatalog.filter((p) => {
+      const matchesCat = productsState.category === "all" || p.category === productsState.category;
+      const matchesQuery = !q || p.name.toLowerCase().includes(q) || (p.desc || "").toLowerCase().includes(q);
+      return matchesCat && matchesQuery;
+    });
+    if (productsState.sort === "name-asc") list = list.slice().sort((a, b) => a.name.localeCompare(b.name));
+    else if (productsState.sort === "name-desc") list = list.slice().sort((a, b) => b.name.localeCompare(a.name));
+    else if (productsState.sort === "category") list = list.slice().sort((a, b) => (a.category || "").localeCompare(b.category || ""));
+    return list;
+  }
+
+  function renderProductsGrid() {
+    const grid = document.getElementById("products-grid");
+    const pag = document.getElementById("products-pagination");
+    if (!grid) return;
+    const list = filteredSortedProducts();
+    const totalPages = Math.max(1, Math.ceil(list.length / productsState.perPage));
+    productsState.page = Math.min(productsState.page, totalPages);
+    const start = (productsState.page - 1) * productsState.perPage;
+    const pageItems = list.slice(start, start + productsState.perPage);
+
+    grid.className = productsState.view === "list" ? "mp-list" : "mp-grid";
+    grid.innerHTML = pageItems.length
+      ? pageItems.map((p) => productCard(p, { showCategory: true })).join("")
+      : '<div class="card" style="padding:32px;text-align:center;grid-column:1/-1"><p>Nenhum produto encontrado para esse filtro.</p></div>';
+
+    if (pag) {
+      if (totalPages <= 1) { pag.innerHTML = ""; }
+      else {
+        let btns = "";
+        for (let i = 1; i <= totalPages; i++) {
+          btns += '<button class="page-btn' + (i === productsState.page ? " active" : "") + '" data-page="' + i + '">' + i + "</button>";
+        }
+        pag.innerHTML = btns;
+      }
+    }
+  }
+
+  function bindProducts() {
+    const search = document.getElementById("products-search");
+    const sort = document.getElementById("products-sort");
+    if (search) search.addEventListener("input", () => { productsState.query = search.value; productsState.page = 1; renderProductsGrid(); });
+    if (sort) { sort.value = productsState.sort; sort.addEventListener("change", () => { productsState.sort = sort.value; renderProductsGrid(); }); }
+
+    document.querySelectorAll(".cat-chip").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        productsState.category = btn.dataset.cat;
+        productsState.page = 1;
+        document.querySelectorAll(".cat-chip").forEach((b) => b.classList.toggle("active", b === btn));
+        renderProductsGrid();
+      })
+    );
+    document.querySelectorAll(".view-btn").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        productsState.view = btn.dataset.view;
+        document.querySelectorAll(".view-btn").forEach((b) => b.classList.toggle("active", b === btn));
+        renderProductsGrid();
+      })
+    );
+    const pag = document.getElementById("products-pagination");
+    if (pag) pag.addEventListener("click", (e) => {
+      const btn = e.target.closest(".page-btn");
+      if (!btn) return;
+      productsState.page = parseInt(btn.dataset.page, 10);
+      renderProductsGrid();
+      const grid = document.getElementById("products-grid");
+      if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    renderProductsGrid();
   }
 
   /* =========================================================
@@ -316,6 +579,7 @@
     const vehicle = gEntry ? TS.mergedVehicle(gEntry) : base;
     if (!brand || !vehicle || !visible) return renderNotFound();
     state.brandId = brandId;
+    state.currentVehicle = vehicle;
 
     const title = gEntry ? gEntry.name : vehicle.name;
     const meta = gEntry
@@ -324,11 +588,13 @@
     const photoSrc = gEntry ? TS.garagePhoto(gEntry) : TS.imgFor(brandId, vehicle);
     const photoStyle = gEntry && gEntry.focus ? ' style="object-position:' + gEntry.focus + '"' : "";
 
+    if (state.tab !== "estetica") state.tab = "performance";
+
     app.innerHTML =
-      navbar("marcas") +
+      navbar("models") +
       "<main>" +
       '<section class="vehicle-hero"><div class="vehicle-hero-bg"></div><div class="container">' +
-      '<div class="breadcrumb"><a href="#/">Início</a><span class="sep">/</span><a href="#/marcas">Modelos</a><span class="sep">/</span><span>' + esc(title) + "</span></div>" +
+      '<div class="breadcrumb"><a href="#/">Home</a><span class="sep">/</span><a href="#/models">Models</a><span class="sep">/</span><span>' + esc(title) + "</span></div>" +
       '<div class="vehicle-title"><div>' +
       "<h1>" + esc(title) + "</h1>" +
       '<div class="meta">' + meta + "</div>" +
@@ -342,96 +608,140 @@
         : '<div class="vehicle-art">' + carSVG(vehicle.hue) +
           '<img class="vehicle-photo" src="' + photoSrc + '" alt="' + esc(title) + '" onerror="this.remove()"/>' +
           "</div>") +
+      /* spec-strip: TODAS as specs importantes vivem aqui agora (ficha técnica
+         separada foi removida — item 4/5 do redesign de UX/conversão). */
+      '<div class="spec-strip">' +
+      "<div><b>" + vehicle.engine + "</b><span>Motor</span></div>" +
+      "<div><b>" + vehicle.power + "</b><span>Potência</span></div>" +
+      "<div><b>" + vehicle.torque + "</b><span>Torque</span></div>" +
+      "<div><b>" + vehicle.accel + "</b><span>0–100 km/h</span></div>" +
+      "<div><b>" + vehicle.gearbox.split(" ").slice(0, 2).join(" ") + "</b><span>Câmbio</span></div>" +
+      "<div><b>" + vehicle.traction + "</b><span>Tração</span></div>" +
+      "<div><b>" + vehicle.weight + "</b><span>Peso</span></div>" +
+      "<div><b>" + vehicle.consumption + "</b><span>Consumo</span></div>" +
+      "<div><b>" + vehicle.top + "</b><span>Vel. máxima</span></div>" +
+      "<div><b>" + vehicle.year + "</b><span>Ano</span></div>" +
+      "</div>" +
+      '<p class="trust-microline">' + I.check + "Compatibilidade verificada por modelo</p>" +
       "</div></section>" +
 
-      '<div class="container">' +
-      '<section class="v-section">' + infoTab(vehicle) + "</section>" +
-      '<section class="v-section v-section--parts">' + partsTab(vehicle) + "</section>" +
-      "</div>" +
+      overviewBlock(vehicle) +
+
+      '<div class="tabs"><div class="container tabs-inner">' +
+      '<button class="tab' + (state.tab === "performance" ? " active" : "") + '" data-tab="performance">Performance</button>' +
+      '<button class="tab' + (state.tab === "estetica" ? " active" : "") + '" data-tab="estetica">Estética</button>' +
+      "</div></div>" +
+      '<div class="container"><div id="tab-content" class="tab-panel">' +
+      (state.tab === "performance" ? performanceHTML(vehicle) : aestheticHTML(vehicle)) +
+      "</div></div>" +
+
+      relatedBlock(brandId, vehicle) +
       "</main>" +
       footer();
 
-    bindParts();
+    bindVehicleTabs(vehicle);
+    bindUpgrades(vehicle);
   }
 
-  /* ---------- Aba Peças ---------- */
-  function partsTab(v) {
-    const parts = TS.getParts(state.brandId, v);
+  /* ---------- Veículos e builds relacionados (SEO internal linking) ---------- */
+  function relatedBlock(brandId, vehicle) {
+    const brandModels = (TS.models[brandId] || [])
+      .filter((m) => isEnabled(brandId, m.id) && m.id !== vehicle.id)
+      .slice(0, 3);
+    const relatedBuilds = (TS.garage || [])
+      .filter((g) => g.brandId === brandId || TS.getVehicle(g.brandId, g.modelId)?.induction === vehicle.induction)
+      .slice(0, 3);
+    if (!brandModels.length && !relatedBuilds.length) return "";
     return (
-      '<div class="section-head"><div><div class="kicker">Catálogo</div>' +
-      "<h2>Peças para o " + v.name + "</h2>" +
-      "<p>Peças compatíveis com o seu carro, com preço médio de referência.</p></div></div>" +
-      (parts.length
-        ? '<div class="part-grid">' + parts.map(partCard).join("") + "</div>"
-        : '<div class="card" style="padding:32px;text-align:center"><p>Nenhuma peça cadastrada ainda — em breve.</p></div>')
-    );
-  }
-
-  function bindParts() {
-    document.querySelectorAll(".see-product").forEach((b) =>
-      b.addEventListener("click", () => toast("Em breve: redirecionamento para Mercado Livre / Shopee"))
-    );
-  }
-
-  /* ---------- Aba Informações ---------- */
-  function infoTab(v) {
-    const consumo = (v.cityKml || v.hwyKml)
-      ? [["fuel", "Consumo cidade", v.cityKml || "—"], ["fuel", "Consumo rodovia", v.hwyKml || "—"]]
-      : [["fuel", "Consumo", v.consumption]];
-    const items = [
-      ["engine", "Motor", v.engine],
-      ["power", "Potência", v.power, true],
-      ["torque", "Torque", v.torque],
-      ["weight", "Peso", v.weight],
-      ...consumo,
-      ["accel", "0–100 km/h", v.accel, true],
-      ["speed", "Velocidade máxima", v.top],
-      ["gearbox", "Câmbio", v.gearbox],
-      ["traction", "Tração", v.traction],
-      ["price", "Preço FIPE", v.fipe],
-    ];
-    if (v.oil) {
-      const gi = items.findIndex((it) => it[1] === "Câmbio");
-      items.splice(gi >= 0 ? gi + 1 : items.length, 0, ["fuel", "Óleo", v.oil]);
-    }
-    return (
-      '<div class="info-grid">' +
-      items
-        .map(
-          (it) =>
-            '<div class="card info-card' + (it[3] ? " highlight" : "") + '">' +
-            '<div class="ic">' + I[it[0]] + "</div>" +
-            "<span>" + it[1] + "</span><b>" + it[2] + "</b></div>"
-        )
-        .join("") +
+      '<div class="container related-wrap">' +
+      '<div class="related-block related-block--cta">' +
+      '<a class="btn btn-ghost" href="#/tools/planejador/' + brandId + "/" + vehicle.id + '">Planejar build para o ' + esc(vehicle.name) + " " + I.accel + "</a>" +
       "</div>" +
+      (brandModels.length
+        ? '<div class="related-block"><div class="kicker">Veículos relacionados</div>' +
+          '<div class="model-grid">' + brandModels.map((m) => modelCard(brandId, m)).join("") + "</div></div>"
+        : "") +
+      (relatedBuilds.length
+        ? '<div class="related-block"><div class="kicker">Builds relacionados</div>' +
+          '<div class="model-grid">' +
+          relatedBuilds
+            .map((g) => {
+              const m = TS.mergedVehicle(g);
+              return m ? modelCard(g.brandId, m, { owner: g.owner, name: g.name, photo: TS.garagePhoto(g), focus: g.focus, href: "#/garagem/" + g.slug }) : "";
+            })
+            .join("") +
+          "</div></div>"
+        : "") +
+      "</div>"
+    );
+  }
+
+  /* ---------- Bloco de build/preparação real (só existe para builds da garagem) ---------- */
+  function overviewBlock(v) {
+    if (!v.mods && !(v.build && v.build.length)) return "";
+    return (
+      '<div class="container">' +
       (v.mods
         ? '<div class="card info-card mods-card"><div class="ic">' + I.ecu + "</div>" +
           "<span>Preparação</span><b>" + esc(v.mods) + "</b></div>"
         : "") +
       (v.build && v.build.length
-        ? '<div class="build-block"><div class="kicker">Build & modificações</div>' +
+        ? '<div class="build-block"><div class="kicker">Build &amp; modificações</div>' +
           '<div class="build-grid">' +
           v.build.map((b) => '<div class="build-item">' + I.check + "<span>" + esc(b) + "</span></div>").join("") +
           "</div></div>"
-        : "")
+        : "") +
+      "</div>"
     );
   }
 
-  /* ---------- Aba Upgrades ---------- */
-  function upgradesTab(v) {
-    return (
-      '<div class="section-head"><div><div class="kicker">Preparação</div>' +
-      "<h2>Upgrades para o " + v.name + "</h2>" +
-      "<p>Projetos organizados por objetivo, com peças compatíveis e profissionais recomendados.</p></div></div>" +
-      '<div class="seg" id="upgrade-seg">' +
-      '<button data-cat="performance" class="' + (state.upgradeCat === "performance" ? "active" : "") + '">Performance</button>' +
-      '<button data-cat="estetica" class="' + (state.upgradeCat === "estetica" ? "active" : "") + '">Estética</button>' +
-      "</div>" +
-      '<div id="upgrade-content">' +
-      (state.upgradeCat === "performance" ? performanceHTML(v) : aestheticHTML(v)) +
-      "</div>"
+  /* ---------- Abas de nível superior: Performance | Estética ---------- */
+  function bindVehicleTabs(v) {
+    document.querySelectorAll(".tabs .tab").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        if (state.tab === btn.dataset.tab) return;
+        state.tab = btn.dataset.tab;
+        renderTab(v);
+      })
     );
+  }
+
+  function renderTab(v) {
+    document.querySelectorAll(".tabs .tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === state.tab));
+    const panel = document.getElementById("tab-content");
+    if (panel) panel.innerHTML = state.tab === "performance" ? performanceHTML(v) : aestheticHTML(v);
+    bindUpgrades(v);
+  }
+
+  /* ---------- CTA fixo global: "Encontrar peças para meu carro" ----------
+     Injetado no final de toda rota (route()), não só na página do veículo.
+     Em página de veículo: rola até as abas. Em qualquer outra página: leva ao catálogo. */
+  function stickyFindPartsCTA() {
+    const onVehiclePage = !!document.getElementById("tab-content");
+    return (
+      '<div class="sticky-cta"><div class="container sticky-cta-inner">' +
+      '<span class="sticky-cta-text">' + I.check +
+      (onVehiclePage ? "Peças compatíveis com o seu carro" : "Milhares de peças e acessórios") + "</span>" +
+      '<button class="btn btn-red btn-sm" id="sticky-find-parts">Encontrar peças para meu carro</button>' +
+      "</div></div>"
+    );
+  }
+  function injectStickyCTA() {
+    document.querySelectorAll(".sticky-cta").forEach((el) => el.remove());
+    app.insertAdjacentHTML("beforeend", stickyFindPartsCTA());
+    const btn = document.getElementById("sticky-find-parts");
+    if (!btn) return;
+    const onVehiclePage = !!document.getElementById("tab-content");
+    btn.addEventListener("click", () => {
+      if (onVehiclePage && state.currentVehicle) {
+        state.tab = "performance";
+        renderTab(state.currentVehicle);
+        const tabs = document.querySelector(".tabs");
+        if (tabs) tabs.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        location.hash = "#/models";
+      }
+    });
   }
 
   function performanceHTML(v) {
@@ -441,6 +751,7 @@
       stages
         .map((s, i) => {
           const badge = s.id.indexOf("stage") === 0 ? "S" + (i + 1) : s.id === "projeto-turbo" ? "TB" : "NA";
+          const investLabel = ["Baixo", "Médio", "Alto", "Muito alto"][Math.min((s.levelIdx || 1) - 1, 3)] || "Médio";
           return (
             '<div class="card stage-card" data-stage="' + s.id + '">' +
             '<div class="stage-head">' +
@@ -448,18 +759,18 @@
             '<div class="stage-badge' + (s.levelIdx === 3 ? " lv3" : "") + '">' + badge + "</div>" +
             "<div><h3>" + s.title + '</h3><div class="desc">' + s.description + "</div></div></div>" +
             '<div class="stage-head-right">' +
-            '<div class="stage-meta"><b>' + s.price + "</b><span>" + s.level + " · " + s.time + "</span></div>" +
+            '<div class="stage-meta"><b>' + s.level + "</b><span>" + investLabel + " investimento · " + s.time + "</span></div>" +
             '<div class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>' +
             "</div></div>" +
             '<div class="stage-body">' +
             '<div class="stage-facts">' +
             '<div class="fact"><span>Objetivo</span><b>' + s.objective + "</b></div>" +
-            '<div class="fact"><span>Faixa de preço</span><b>' + s.price + "</b></div>" +
+            '<div class="fact"><span>Investimento</span><b>' + investLabel + "</b></div>" +
             '<div class="fact"><span>Dificuldade</span><b>' + s.level + "</b></div>" +
             '<div class="fact"><span>Tempo médio</span><b>' + s.time + "</b></div>" +
             "</div>" +
             '<div class="subhead">Peças recomendadas</div>' +
-            '<div class="part-grid">' + s.parts.map(partCard).join("") + "</div>" +
+            '<div class="mp-grid">' + s.parts.map((p) => productCard(p)).join("") + "</div>" +
             '<div class="subhead">Profissionais recomendados</div>' +
             '<div class="pro-grid">' + s.pros.map((id) => proCard(TS.getPro(id))).join("") + "</div>" +
             "</div></div>"
@@ -470,21 +781,60 @@
     );
   }
 
-  function partCard(p) {
-    const priceHTML = p.price
-      ? '<div class="price"><b>' + p.price + "</b><span>preço médio</span></div>"
-      : '<div class="price"><span>ver preço no anúncio</span></div>';
-    const buttonHTML = p.link
-      ? '<a class="btn btn-ghost btn-sm" href="' + esc(p.link) + '" target="_blank" rel="noopener nofollow sponsored">Ver produto ' + I.external + "</a>"
-      : '<button class="btn btn-ghost btn-sm see-product">Ver produto ' + I.external + "</button>";
+  /* ---------- Marketplace: rede, link e card de produto ----------
+     Todo produto sempre tem um destino real: se a peça já tem link próprio
+     (afiliado), ele é usado; senão, cai numa busca real no marketplace certo.
+     Isso elimina o botão "Em breve" que existia antes. */
+  function networkMeta(p) {
+    let net = p.network;
+    if (!net && p.link) net = /shopee/i.test(p.link) ? "shopee" : "mercadolivre";
+    net = net === "shopee" ? "shopee" : "mercadolivre";
+    return net === "shopee"
+      ? { id: "shopee", label: "Shopee", short: "Shopee" }
+      : { id: "mercadolivre", label: "Mercado Livre", short: "Mercado Livre" };
+  }
+  /* ---------- Parsers numéricos (compare / build planner) ---------- */
+  function parsePrice(str) {
+    if (!str) return null;
+    const n = String(str).replace(/[^\d,]/g, "").replace(",", ".");
+    const v = parseFloat(n);
+    return isNaN(v) ? null : v;
+  }
+  function parseNum(str) {
+    if (!str) return null;
+    const n = String(str).replace(",", ".").match(/-?\d+(\.\d+)?/);
+    return n ? parseFloat(n[0]) : null;
+  }
+
+  function marketplaceSearchUrl(networkId, query) {
+    const q = encodeURIComponent(query);
+    return networkId === "shopee"
+      ? "https://shopee.com.br/search?keyword=" + q
+      : "https://lista.mercadolivre.com.br/" + q.replace(/%20/g, "-");
+  }
+
+  /* ---------- Card de produto (afiliado) ----------
+     Só os 4 elementos essenciais: imagem, título, badge de marketplace e CTA.
+     Preço fica só na loja (evita preço desatualizado). opts.showCategory liga
+     o chip de categoria — usado só na página /products. */
+  function productCard(p, opts) {
+    opts = opts || {};
+    const net = networkMeta(p);
+    const href = p.link || marketplaceSearchUrl(net.id, p.name);
+    const catName = opts.showCategory && p.category ? (TS.productCategories.find((c) => c.id === p.category) || {}).name : null;
     return (
-      '<div class="card part-card">' +
-      '<div class="part-thumb">' + I[p.icon] + "</div>" +
-      "<h4>" + p.name + "</h4><p>" + p.desc + "</p>" +
-      (p.compat
-        ? '<div class="part-compat">' + I.check + esc(p.compat) + "</div>"
-        : "") +
-      '<div class="part-foot">' + priceHTML + buttonHTML + "</div></div>"
+      '<article class="card mp-card">' +
+      '<div class="mp-thumb mp-thumb--white">' +
+      '<span class="mp-badge mp-badge--' + net.id + '">' + net.label + "</span>" +
+      (I[p.icon] || I.gauge) +
+      "</div>" +
+      '<div class="mp-body">' +
+      (catName ? '<span class="mp-cat-chip">' + esc(catName) + "</span>" : "") +
+      "<h4 class=\"mp-title\">" + esc(p.name) + "</h4>" +
+      '<a class="mp-cta mp-cta--' + net.id + '" href="' + esc(href) + '" target="_blank" rel="sponsored nofollow noopener" ' +
+      'data-part="' + esc(p.name) + '" data-network="' + net.id + '">' +
+      "Ver na " + net.short + " " + I.external + "</a>" +
+      "</div></article>"
     );
   }
 
@@ -521,20 +871,11 @@
         .join("") +
       "</div>" +
       '<div class="subhead">' + active.name + " · " + active.desc + "</div>" +
-      '<div class="part-grid">' + active.products.map(partCard).join("") + "</div>"
+      '<div class="mp-grid">' + active.products.map((p) => productCard(p)).join("") + "</div>"
     );
   }
 
   function bindUpgrades(v) {
-    const seg = document.getElementById("upgrade-seg");
-    if (seg)
-      seg.querySelectorAll("button").forEach((b) =>
-        b.addEventListener("click", () => {
-          state.upgradeCat = b.dataset.cat;
-          renderTab(v);
-        })
-      );
-
     document.querySelectorAll(".stage-head").forEach((h) =>
       h.addEventListener("click", () => h.closest(".stage-card").classList.toggle("open"))
     );
@@ -548,8 +889,11 @@
         })
       );
 
-    document.querySelectorAll(".see-product").forEach((b) =>
-      b.addEventListener("click", () => toast("Em breve: redirecionamento para Mercado Livre / Shopee"))
+    document.querySelectorAll(".mp-cta").forEach((a) =>
+      a.addEventListener("click", () => {
+        // ponto único de rastreio de clique de afiliado (pronto para plugar analytics)
+        if (window.plausible) window.plausible("affiliate_click", { props: { part: a.dataset.part, network: a.dataset.network } });
+      })
     );
     document.querySelectorAll(".contact-pro").forEach((b) =>
       b.addEventListener("click", () => toast("Abrindo conversa com " + b.dataset.name + "…"))
@@ -730,6 +1074,495 @@
     });
   }
 
+  /* =========================================================
+     GUIAS (blog / conteúdo editorial)
+     ========================================================= */
+  /* =========================================================
+     /blog — mescla Guias + Top 10 num único hub de conteúdo
+     ========================================================= */
+  const TOPLIST_COVER = { "acessorios-universais": "gauge", "upgrades-stage-1-mais-procurados": "ecu" };
+  // Categoria de peça (artigos antigos) -> categoria de produto (novo /products), para linkar conteúdo->produto
+  const PART_CAT_TO_PRODUCT_CAT = {
+    ecu: "performance", escape: "performance", admissao: "performance", turbo: "performance",
+    standalone: "performance", intercooler: "performance", combustivel: "performance",
+    transmissao: "performance", internos: "performance", suspensao: "performance", freios: "performance",
+    rodas: "tires", aero: "accessories", iluminacao: "lighting", envelopamento: "accessories",
+    instrumentacao: "performance", cockpit: "interior", acessorios: "accessories", som: "audio",
+  };
+
+  function blogPosts() {
+    const guides = TS.articles.map((a) => Object.assign({ type: "guide", badge: "Guia" }, a));
+    const tops = TS.topLists.map((l) =>
+      Object.assign({ type: "top10", badge: "Top 10", title: l.title, excerpt: l.intro, cover: TOPLIST_COVER[l.slug] || "gauge" }, l)
+    );
+    return guides.concat(tops);
+  }
+
+  function renderBlog() {
+    const posts = blogPosts();
+    const cards = posts
+      .map(
+        (p) =>
+          '<a class="card guide-card" href="#/blog/' + p.slug + '">' +
+          '<span class="guide-type-badge guide-type-badge--' + p.type + '">' + p.badge + "</span>" +
+          '<div class="guide-cover">' + I[p.cover] + "</div>" +
+          '<div class="guide-body"><h3>' + esc(p.title) + "</h3><p>" + esc(p.excerpt) + "</p>" +
+          '<span class="guide-readmore">Ler ' + (p.type === "top10" ? "lista" : "guia") + " " + I.accel + "</span></div></a>"
+      )
+      .join("");
+    app.innerHTML =
+      navbar("blog") +
+      "<main>" +
+      '<div class="page-head"><div class="container">' +
+      '<div class="breadcrumb"><a href="#/">Home</a><span class="sep">/</span><span>Blog</span></div>' +
+      "<h1>Blog</h1>" +
+      '<p class="sub">Guias, comparativos e rankings Top 10 — conteúdo direto ao ponto para decidir com informação.</p>' +
+      "</div></div>" +
+      '<section class="section" style="padding-top:44px"><div class="container">' +
+      '<div class="guide-grid">' + cards + "</div>" +
+      "</div></section></main>" +
+      footer();
+  }
+
+  function relatedProductsForCategories(categoryIds, limit) {
+    const productCats = new Set(categoryIds.map((c) => PART_CAT_TO_PRODUCT_CAT[c]).filter(Boolean));
+    if (!productCats.size) return [];
+    return TS.productsCatalog.filter((p) => productCats.has(p.category)).slice(0, limit || 3);
+  }
+
+  function renderBlogDetail(slug) {
+    const posts = blogPosts();
+    const post = posts.find((p) => p.slug === slug);
+    if (!post) return renderNotFound();
+    const related = posts.filter((p) => p.slug !== slug).slice(0, 3);
+
+    let bodyHTML;
+    if (post.type === "guide") {
+      const relatedProducts = relatedProductsForCategories(post.relatedCategories || []);
+      bodyHTML =
+        '<div class="guide-article">' + post.body + "</div>" +
+        (relatedProducts.length
+          ? '<div class="guide-related-products"><div class="kicker">Produtos relacionados</div>' +
+            '<div class="mp-grid">' + relatedProducts.map((p) => productCard(p)).join("") + "</div></div>"
+          : "");
+    } else {
+      bodyHTML =
+        '<div class="top10-list">' +
+        post.items
+          .slice(0, 10)
+          .map((p, i) => '<div class="top10-row"><div class="top10-rank">' + (i + 1) + "</div>" + productCard(p) + "</div>")
+          .join("") +
+        "</div>";
+    }
+
+    app.innerHTML =
+      navbar("blog") +
+      "<main>" +
+      '<div class="page-head"><div class="container">' +
+      '<div class="breadcrumb"><a href="#/">Home</a><span class="sep">/</span><a href="#/blog">Blog</a><span class="sep">/</span><span>' + esc(post.title) + "</span></div>" +
+      '<span class="guide-type-badge guide-type-badge--' + post.type + '" style="margin-bottom:12px">' + post.badge + "</span>" +
+      "<h1>" + esc(post.title) + "</h1>" +
+      '<p class="sub">' + esc(post.excerpt) + "</p>" +
+      "</div></div>" +
+      '<section class="section" style="padding-top:44px"><div class="container container--narrow">' +
+      bodyHTML +
+      (related.length
+        ? '<div class="guide-related"><div class="kicker">Leia também</div><div class="guide-related-list">' +
+          related.map((r) => '<a href="#/blog/' + r.slug + '">' + esc(r.title) + " " + I.accel + "</a>").join("") +
+          "</div></div>"
+        : "") +
+      '<div class="guide-related"><a class="btn btn-ghost btn-sm" href="#/products">Ver todos os produtos ' + I.accel + "</a></div>" +
+      "</div></section></main>" +
+      footer();
+  }
+
+  /* =========================================================
+     CALCULADORAS
+     ========================================================= */
+  function calculatorsPanelHTML() {
+    return (
+      '<div class="tools-panel-head"><div class="kicker">Calculadoras</div>' +
+      "<h2>Ferramentas rápidas</h2><p>Para o dia a dia de quem prepara o carro.</p></div>" +
+      '<div class="calc-grid">' +
+
+      '<div class="card calc-card">' +
+      '<div class="section-head" style="margin-bottom:20px"><div><div class="kicker">Conversor</div>' +
+      "<h2>cv ⇄ hp ⇄ kW</h2><p>Converta entre as unidades de potência mais usadas no Brasil, EUA e Europa.</p></div></div>" +
+      '<div class="calc-tool">' +
+      '<label>cv (métrico)<input type="number" id="calc-cv" placeholder="Ex: 150"/></label>' +
+      '<label>hp (SAE)<input type="number" id="calc-hp" placeholder="Ex: 148"/></label>' +
+      '<label>kW<input type="number" id="calc-kw" placeholder="Ex: 110"/></label>' +
+      "</div></div>" +
+
+      '<div class="card calc-card">' +
+      '<div class="section-head" style="margin-bottom:20px"><div><div class="kicker">Estimativa</div>' +
+      "<h2>Ganho estimado por Stage</h2><p>Informe a potência de fábrica e o estágio pretendido para uma faixa estimada — não substitui o dyno.</p></div></div>" +
+      '<div class="calc-tool">' +
+      '<label>Potência de fábrica (cv)<input type="number" id="calc-base-power" placeholder="Ex: 116"/></label>' +
+      '<label>Estágio<select id="calc-stage">' +
+      '<option value="0.15-0.25">Stage 1 (+15% a +25%)</option>' +
+      '<option value="0.25-0.40">Stage 2 (+25% a +40%)</option>' +
+      '<option value="0.40-0.70">Stage 3 (+40% a +70%)</option>' +
+      "</select></label>" +
+      '<div class="calc-result" id="calc-stage-result">Preencha a potência para ver a estimativa.</div>' +
+      "</div></div>" +
+
+      '<div class="card calc-card">' +
+      '<div class="section-head" style="margin-bottom:20px"><div><div class="kicker">Fitment</div>' +
+      "<h2>Calculadora de pneus</h2><p>Compare a medida original com uma nova e veja a diferença de diâmetro e de velocímetro.</p></div></div>" +
+      '<div class="calc-tool calc-tool--tire">' +
+      '<div class="calc-tire-col"><span class="calc-tire-label">Pneu original</span>' +
+      '<div class="calc-tire-row"><input type="number" id="tire-a-w" placeholder="195" title="Largura (mm)"/><span>/</span>' +
+      '<input type="number" id="tire-a-p" placeholder="65" title="Perfil (%)"/><span>R</span>' +
+      '<input type="number" id="tire-a-r" placeholder="15" title="Aro (pol)"/></div></div>' +
+      '<div class="calc-tire-col"><span class="calc-tire-label">Pneu novo</span>' +
+      '<div class="calc-tire-row"><input type="number" id="tire-b-w" placeholder="205" title="Largura (mm)"/><span>/</span>' +
+      '<input type="number" id="tire-b-p" placeholder="55" title="Perfil (%)"/><span>R</span>' +
+      '<input type="number" id="tire-b-r" placeholder="16" title="Aro (pol)"/></div></div>' +
+      '<div class="calc-result" id="calc-tire-result">Preencha as duas medidas para comparar.</div>' +
+      "</div></div>" +
+
+      '<div class="card calc-card">' +
+      '<div class="section-head" style="margin-bottom:20px"><div><div class="kicker">Economia</div>' +
+      "<h2>Consumo de combustível</h2><p>Km/l real a partir do que você rodou e abasteceu — e o custo por km.</p></div></div>" +
+      '<div class="calc-tool">' +
+      '<label>Km rodados desde o abastecimento<input type="number" id="calc-km" placeholder="Ex: 420"/></label>' +
+      '<label>Litros abastecidos<input type="number" id="calc-liters" placeholder="Ex: 35"/></label>' +
+      '<label>Preço do litro (opcional)<input type="number" step="0.01" id="calc-fuel-price" placeholder="Ex: 5.89"/></label>' +
+      '<div class="calc-result" id="calc-fuel-result">Preencha km e litros para calcular.</div>' +
+      "</div></div>" +
+
+      "</div>"
+    );
+  }
+
+  function bindCalculators() {
+    const cv = document.getElementById("calc-cv");
+    const hp = document.getElementById("calc-hp");
+    const kw = document.getElementById("calc-kw");
+    if (cv && hp && kw) {
+      const fromCv = (v) => { hp.value = (v * 0.98632).toFixed(1); kw.value = (v * 0.7355).toFixed(1); };
+      const fromHp = (v) => { cv.value = (v * 1.01387).toFixed(1); kw.value = (v * 0.7457).toFixed(1); };
+      const fromKw = (v) => { cv.value = (v * 1.35962).toFixed(1); hp.value = (v * 1.34102).toFixed(1); };
+      cv.addEventListener("input", () => { if (cv.value) fromCv(parseFloat(cv.value)); });
+      hp.addEventListener("input", () => { if (hp.value) fromHp(parseFloat(hp.value)); });
+      kw.addEventListener("input", () => { if (kw.value) fromKw(parseFloat(kw.value)); });
+    }
+
+    const basePower = document.getElementById("calc-base-power");
+    const stageSel = document.getElementById("calc-stage");
+    const result = document.getElementById("calc-stage-result");
+    function updateStageEstimate() {
+      const base = parseFloat(basePower.value);
+      if (!base || base <= 0) { result.textContent = "Preencha a potência para ver a estimativa."; return; }
+      const [lo, hi] = stageSel.value.split("-").map(Number);
+      const min = Math.round(base * (1 + lo));
+      const max = Math.round(base * (1 + hi));
+      result.innerHTML = "Estimativa: <b>" + min + " – " + max + " cv</b> <span>(faixa aproximada, varia por carro e execução)</span>";
+    }
+    if (basePower && stageSel && result) {
+      basePower.addEventListener("input", updateStageEstimate);
+      stageSel.addEventListener("change", updateStageEstimate);
+    }
+
+    /* Calculadora de pneus */
+    const tireIds = ["tire-a-w", "tire-a-p", "tire-a-r", "tire-b-w", "tire-b-p", "tire-b-r"];
+    const tireEls = tireIds.map((id) => document.getElementById(id));
+    const tireResult = document.getElementById("calc-tire-result");
+    function tireDiameter(w, p, r) { return r * 25.4 + 2 * (w * (p / 100)); }
+    function updateTire() {
+      const [aw, ap, ar, bw, bp, br] = tireEls.map((el) => parseFloat(el && el.value));
+      if (!aw || !ap || !ar || !bw || !bp || !br) { tireResult.textContent = "Preencha as duas medidas para comparar."; return; }
+      const da = tireDiameter(aw, ap, ar);
+      const db = tireDiameter(bw, bp, br);
+      const diffPct = ((db - da) / da) * 100;
+      const speedoAt100 = 100 * (db / da);
+      tireResult.innerHTML =
+        "Diâmetro: <b>" + da.toFixed(0) + " mm → " + db.toFixed(0) + " mm</b> (" + (diffPct >= 0 ? "+" : "") + diffPct.toFixed(1) + "%)" +
+        '<span>Com o pneu novo, quando o velocímetro marcar 100 km/h a velocidade real será ~' + speedoAt100.toFixed(0) + " km/h.</span>";
+    }
+    if (tireEls.every(Boolean)) tireEls.forEach((el) => el.addEventListener("input", updateTire));
+
+    /* Calculadora de consumo */
+    const kmEl = document.getElementById("calc-km");
+    const litersEl = document.getElementById("calc-liters");
+    const fuelPriceEl = document.getElementById("calc-fuel-price");
+    const fuelResult = document.getElementById("calc-fuel-result");
+    function updateFuel() {
+      const km = parseFloat(kmEl.value), liters = parseFloat(litersEl.value);
+      if (!km || !liters) { fuelResult.textContent = "Preencha km e litros para calcular."; return; }
+      const kml = km / liters;
+      let extra = "";
+      const price = parseFloat(fuelPriceEl.value);
+      if (price) {
+        const costPerKm = price / kml;
+        extra = '<span>Custo aproximado: R$ ' + costPerKm.toFixed(2) + " por km.</span>";
+      }
+      fuelResult.innerHTML = "Consumo: <b>" + kml.toFixed(1) + " km/l</b>" + extra;
+    }
+    if (kmEl && litersEl && fuelResult) [kmEl, litersEl, fuelPriceEl].forEach((el) => el.addEventListener("input", updateFuel));
+  }
+
+  /* =========================================================
+     COMPARADOR (/comparar · /compare)
+     ========================================================= */
+  function vehicleOptionsHTML(selectedKey) {
+    return Object.keys(TS.models)
+      .map((brandId) => {
+        const brand = TS.getBrand(brandId);
+        const opts = TS.models[brandId]
+          .filter((m) => isEnabled(brandId, m.id))
+          .map((m) => {
+            const key = brandId + ":" + m.id;
+            return '<option value="' + key + '"' + (key === selectedKey ? " selected" : "") + ">" + esc(m.name) + "</option>";
+          })
+          .join("");
+        return '<optgroup label="' + esc(brand ? brand.name : brandId) + '">' + opts + "</optgroup>";
+      })
+      .join("");
+  }
+
+  const STAGE_GAIN = { stock: 0, stage1: 0.20, stage2: 0.32, stage3: 0.55 };
+  const STAGE_LABEL = { stock: "De fábrica", stage1: "Stage 1", stage2: "Stage 2", stage3: "Stage 3" };
+
+  function applyStage(vehicle, stageKey) {
+    const gain = STAGE_GAIN[stageKey] || 0;
+    const basePower = parseNum(vehicle.power) || 0;
+    const baseAccel = parseNum(vehicle.accel) || 0;
+    const newPower = Math.round(basePower * (1 + gain));
+    // aproximação física: tempo de aceleração escala ~ raiz(potência antiga/nova) a peso constante
+    const newAccel = gain > 0 && basePower > 0 ? +(baseAccel * Math.sqrt(basePower / newPower)).toFixed(1) : baseAccel;
+    return { power: newPower + " cv", accel: newAccel + " s", gained: gain > 0 };
+  }
+
+  function comparePanelHTML(urlParts) {
+    return (
+      '<div class="tools-panel-head"><div class="kicker">Comparador</div>' +
+      "<h2>Comparar veículos</h2><p>Compare specs lado a lado e veja o efeito de cada Stage em tempo real.</p></div>" +
+      '<div class="compare-controls">' +
+      '<label class="compare-select">Veículo A<select id="cmp-a"><option value="">Escolha um carro…</option>' + vehicleOptionsHTML(urlParts[0] && urlParts[1] ? urlParts[0] + ":" + urlParts[1] : "") + "</select></label>" +
+      '<label class="compare-select">Veículo B<select id="cmp-b"><option value="">Escolha um carro…</option>' + vehicleOptionsHTML(urlParts[2] && urlParts[3] ? urlParts[2] + ":" + urlParts[3] : "") + "</select></label>" +
+      '<label class="compare-select">Veículo C (opcional)<select id="cmp-c"><option value="">+ Adicionar terceiro</option>' + vehicleOptionsHTML(urlParts[4] && urlParts[5] ? urlParts[4] + ":" + urlParts[5] : "") + "</select></label>" +
+      '<label class="compare-select compare-select--stage">Estágio aplicado<select id="cmp-stage">' +
+      Object.keys(STAGE_LABEL).map((k) => '<option value="' + k + '">' + STAGE_LABEL[k] + "</option>").join("") +
+      "</select></label>" +
+      "</div>" +
+      '<p class="calc-disclaimer">' + I.check + "Potência/aceleração por Stage são estimativas — variam por carro e execução, não substituem dyno.</p>" +
+      '<div id="compare-table-wrap"></div>'
+    );
+  }
+
+  function bindCompare() {
+    const a = document.getElementById("cmp-a"), b = document.getElementById("cmp-b"), c = document.getElementById("cmp-c"), st = document.getElementById("cmp-stage");
+    if (!a || !b) return;
+    function update() { renderCompareTable([a.value, b.value, c.value], st.value); }
+    [a, b, c, st].forEach((el) => el.addEventListener("change", update));
+    update();
+  }
+
+  function renderCompareTable(keys, stageKey) {
+    const wrap = document.getElementById("compare-table-wrap");
+    if (!wrap) return;
+    const cols = keys
+      .filter(Boolean)
+      .map((key) => {
+        const [brandId, modelId] = key.split(":");
+        const vehicle = TS.getVehicle(brandId, modelId);
+        return vehicle ? { brandId, vehicle } : null;
+      })
+      .filter(Boolean);
+
+    if (cols.length < 2) {
+      wrap.innerHTML = '<div class="card" style="padding:32px;text-align:center"><p>Escolha pelo menos dois veículos para comparar.</p></div>';
+      return;
+    }
+
+    const rows = [
+      ["Motor", (v) => v.engine, false],
+      ["Indução", (v) => (v.induction === "turbo" ? "Turbo" : v.induction === "diesel-turbo" ? "Diesel turbo" : v.induction === "hibrido" ? "Híbrido" : "Aspirado"), false],
+      ["Potência", (v) => applyStage(v, stageKey).power, true],
+      ["Torque", (v) => v.torque, false],
+      ["0–100 km/h", (v) => applyStage(v, stageKey).accel, true],
+      ["Vel. máxima", (v) => v.top, false],
+      ["Câmbio", (v) => v.gearbox, false],
+      ["Tração", (v) => v.traction, false],
+      ["Peso", (v) => v.weight, false],
+      ["Consumo", (v) => v.consumption, false],
+      ["FIPE", (v) => v.fipe, false],
+    ];
+
+    wrap.innerHTML =
+      '<div class="cmp-wrap"><table class="cmp tnum-table">' +
+      "<thead><tr><th></th>" + cols.map((c) => "<th>" + esc(c.vehicle.name) + "</th>").join("") + "</tr></thead><tbody>" +
+      rows
+        .map(
+          ([label, fn, highlight]) =>
+            "<tr><th>" + label + "</th>" +
+            cols.map((c) => "<td" + (highlight && stageKey !== "stock" ? ' class="cmp-changed"' : "") + ' data-col="' + esc(label) + '">' + esc(fn(c.vehicle)) + "</td>").join("") +
+            "</tr>"
+        )
+        .join("") +
+      "</tbody></table></div>" +
+      '<div class="compare-cta-row">' +
+      cols.map((c) => '<a class="btn btn-ghost btn-sm" href="#/veiculo/' + c.brandId + "/" + c.vehicle.id + '">Ver upgrades do ' + esc(c.vehicle.name) + "</a>").join("") +
+      "</div>";
+  }
+
+  /* =========================================================
+     PLANEJADOR DE BUILD (/planejador · /build-planner)
+     ========================================================= */
+  const BUILD_GOALS = [
+    { id: "diaria", label: "Uso diário" },
+    { id: "rua", label: "Rua" },
+    { id: "turbo", label: "Turbo" },
+    { id: "track", label: "Track Day" },
+    { id: "drift", label: "Drift" },
+    { id: "visual", label: "Visual" },
+  ];
+  const BUILD_BUDGETS = [
+    { id: "2000", label: "R$ 2.000", value: 2000 },
+    { id: "5000", label: "R$ 5.000", value: 5000 },
+    { id: "10000", label: "R$ 10.000", value: 10000 },
+    { id: "20000", label: "R$ 20.000", value: 20000 },
+    { id: "50000+", label: "R$ 50.000+", value: 999999 },
+  ];
+
+  function generateBuild(vehicle, goalId, budget) {
+    const stages = TS.getPerformanceStages(vehicle) || [];
+    const aesthetic = TS.getAestheticCategories(vehicle) || [];
+    let pool = [];
+    if (goalId === "diaria") {
+      pool = pool.concat((stages[0] && stages[0].parts) || []);
+      const interior = aesthetic.find((c) => c.id === "interior");
+      if (interior) pool = pool.concat(interior.products);
+    } else if (goalId === "visual") {
+      aesthetic.forEach((c) => (pool = pool.concat(c.products)));
+    } else {
+      // rua / turbo / track / drift: performance em primeiro lugar
+      stages.forEach((s) => (pool = pool.concat(s.parts)));
+      if (goalId === "track" || goalId === "drift") {
+        const susp = aesthetic.find((c) => c.id === "suspensao");
+        if (susp) pool = pool.concat(susp.products);
+      }
+      if (goalId === "rua") {
+        const som = aesthetic.find((c) => c.id === "som");
+        if (som) pool = pool.concat(som.products);
+      }
+    }
+    const seen = new Set();
+    pool = pool.filter((p) => { if (seen.has(p.name)) return false; seen.add(p.name); return true; });
+    pool.sort((x, y) => (parsePrice(x.price) || 0) - (parsePrice(y.price) || 0));
+
+    const items = [];
+    let total = 0;
+    for (const p of pool) {
+      const price = parsePrice(p.price) || 0;
+      if (items.length === 0 || total + price <= budget) { items.push(p); total += price; }
+      if (total >= budget) break;
+    }
+    return { items, total, poolSize: pool.length };
+  }
+
+  function plannerPanelHTML(urlParts) {
+    return (
+      '<div class="tools-panel-head"><div class="kicker">Planejador</div>' +
+      "<h2>Planejador de Build</h2><p>Escolha carro, objetivo e orçamento — a gente monta a lista de peças.</p></div>" +
+      '<div class="planner-controls">' +
+      '<label class="compare-select">Veículo<select id="bp-vehicle"><option value="">Escolha um carro…</option>' + vehicleOptionsHTML(urlParts[0] && urlParts[1] ? urlParts[0] + ":" + urlParts[1] : "") + "</select></label>" +
+      '<label class="compare-select">Objetivo<select id="bp-goal">' +
+      BUILD_GOALS.map((g) => '<option value="' + g.id + '">' + g.label + "</option>").join("") +
+      "</select></label>" +
+      '<label class="compare-select">Orçamento<select id="bp-budget">' +
+      BUILD_BUDGETS.map((b) => '<option value="' + b.id + '">' + b.label + "</option>").join("") +
+      "</select></label>" +
+      "</div>" +
+      '<div id="planner-result"></div>'
+    );
+  }
+
+  function bindBuildPlanner() {
+    const vSel = document.getElementById("bp-vehicle"), gSel = document.getElementById("bp-goal"), bSel = document.getElementById("bp-budget");
+    if (!vSel) return;
+    function update() { renderPlannerResult(vSel.value, gSel.value, bSel.value); }
+    [vSel, gSel, bSel].forEach((el) => el.addEventListener("change", update));
+    update();
+  }
+
+  function renderPlannerResult(key, goalId, budgetId) {
+    const result = document.getElementById("planner-result");
+    if (!result) return;
+    if (!key) {
+      result.innerHTML = '<div class="card" style="padding:32px;text-align:center"><p>Escolha um veículo para gerar o build.</p></div>';
+      return;
+    }
+    const [brandId, modelId] = key.split(":");
+    const vehicle = TS.getVehicle(brandId, modelId);
+    const budget = (BUILD_BUDGETS.find((b) => b.id === budgetId) || BUILD_BUDGETS[1]).value;
+    const goal = BUILD_GOALS.find((g) => g.id === goalId) || BUILD_GOALS[0];
+    const { items, total, poolSize } = generateBuild(vehicle, goal.id, budget);
+
+    if (!items.length) {
+      result.innerHTML = '<div class="card" style="padding:32px;text-align:center"><p>Não há peças cadastradas para essa combinação ainda.</p></div>';
+      return;
+    }
+
+    result.innerHTML =
+      '<div class="planner-summary">' +
+      '<div class="planner-summary-item"><span>Carro</span><b>' + esc(vehicle.name) + "</b></div>" +
+      '<div class="planner-summary-item"><span>Objetivo</span><b>' + esc(goal.label) + "</b></div>" +
+      '<div class="planner-summary-item"><span>Itens no plano</span><b>' + items.length + " de " + poolSize + "</b></div>" +
+      '<div class="planner-summary-item planner-summary-item--total"><span>Total estimado</span><b class="tnum">R$ ' + total.toLocaleString("pt-BR") + "</b></div>" +
+      "</div>" +
+      '<div class="mp-grid">' + items.map((p) => productCard(p)).join("") + "</div>" +
+      '<div class="planner-cta-row"><a class="btn btn-red" href="#/veiculo/' + brandId + "/" + modelId + '">Ver ficha completa do ' + esc(vehicle.name) + "</a></div>";
+  }
+
+  /* =========================================================
+     /tools — mescla Calculadoras + Comparador + Planejador
+     ========================================================= */
+  const TOOLS_TABS = [
+    { id: "calculadoras", label: "Calculadoras" },
+    { id: "comparar", label: "Comparador" },
+    { id: "planejador", label: "Planejador" },
+  ];
+
+  function renderTools(subview, urlParts) {
+    subview = TOOLS_TABS.some((t) => t.id === subview) ? subview : "calculadoras";
+    app.innerHTML =
+      navbar("tools") +
+      "<main>" +
+      '<div class="page-head"><div class="container">' +
+      '<div class="breadcrumb"><a href="#/">Home</a><span class="sep">/</span><span>Tools</span></div>' +
+      "<h1>Tools</h1>" +
+      '<p class="sub">Calculadoras, comparador de veículos e planejador de build — tudo em um só lugar.</p>' +
+      "</div></div>" +
+      '<div class="tabs"><div class="container tabs-inner">' +
+      TOOLS_TABS.map((t) => '<button class="tab' + (t.id === subview ? " active" : "") + '" data-tools-tab="' + t.id + '">' + t.label + "</button>").join("") +
+      "</div></div>" +
+      '<section class="section" style="padding-top:36px"><div class="container">' +
+      '<div id="tools-panel"></div>' +
+      "</div></section></main>" +
+      footer();
+
+    document.querySelectorAll("[data-tools-tab]").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        const tab = btn.dataset.toolsTab;
+        document.querySelectorAll("[data-tools-tab]").forEach((b) => b.classList.toggle("active", b === btn));
+        history.replaceState(null, "", "#/tools/" + tab);
+        renderToolsPanel(tab, []);
+      })
+    );
+    renderToolsPanel(subview, urlParts);
+  }
+
+  function renderToolsPanel(subview, urlParts) {
+    const panel = document.getElementById("tools-panel");
+    if (!panel) return;
+    if (subview === "comparar") { panel.innerHTML = comparePanelHTML(urlParts); bindCompare(); }
+    else if (subview === "planejador") { panel.innerHTML = plannerPanelHTML(urlParts); bindBuildPlanner(); }
+    else { panel.innerHTML = calculatorsPanelHTML(); bindCalculators(); }
+  }
+
   /* ---------- 404 ---------- */
   function renderNotFound() {
     app.innerHTML =
@@ -748,20 +1581,36 @@
     const parts = hash.split("?")[0].split("/").filter(Boolean);
     window.scrollTo(0, 0);
 
-    if (parts.length === 0) return renderHome();
-    if (parts[0] === "marcas") return renderBrands();
-    if (parts[0] === "marca" && parts[1]) return renderBrand(parts[1]);
-    if (parts[0] === "garagem" && parts[1]) {
+    if (parts.length === 0) renderHome();
+    else if ((parts[0] === "models" || parts[0] === "marcas") && !parts[1]) renderModels();
+    else if ((parts[0] === "models" || parts[0] === "marca") && parts[1]) renderBrand(parts[1]);
+    else if (parts[0] === "products") renderProducts();
+    else if (parts[0] === "garagem" && parts[1]) {
       const g = TS.garageBySlug(parts[1]);
-      if (!g) return renderNotFound();
-      state.tab = "informacoes";
-      return renderVehicle(g.brandId, g.modelId, g);
+      if (!g) renderNotFound();
+      else { state.tab = "performance"; renderVehicle(g.brandId, g.modelId, g); }
     }
-    if (parts[0] === "veiculo" && parts[1] && parts[2]) {
-      state.tab = "informacoes";
-      return renderVehicle(parts[1], parts[2], null);
+    else if (parts[0] === "veiculo" && parts[1] && parts[2]) {
+      state.tab = "performance";
+      renderVehicle(parts[1], parts[2], null);
     }
-    renderNotFound();
+    // /blog (mescla Guias + Top 10) — rotas antigas viram alias, sem quebrar links já compartilhados
+    else if (parts[0] === "blog" && !parts[1]) renderBlog();
+    else if (parts[0] === "blog" && parts[1]) renderBlogDetail(parts[1]);
+    else if (parts[0] === "guias" && !parts[1]) renderBlog();
+    else if (parts[0] === "guia" && parts[1]) renderBlogDetail(parts[1]);
+    else if ((parts[0] === "top10" || parts[0] === "top-10") && !parts[1]) renderBlog();
+    else if ((parts[0] === "top10" || parts[0] === "top-10") && parts[1]) renderBlogDetail(parts[1]);
+    // /tools (mescla Calculadoras + Comparador + Planejador) — rotas antigas viram alias
+    else if (parts[0] === "tools") renderTools(parts[1], parts.slice(2));
+    else if (parts[0] === "calculadoras" || parts[0] === "calculators") renderTools("calculadoras", []);
+    else if (parts[0] === "comparar" || parts[0] === "compare") renderTools("comparar", parts.slice(1));
+    else if (parts[0] === "planejador" || parts[0] === "build-planner") renderTools("planejador", parts.slice(1));
+    // /projetos foi removida do produto — cai em 404 propositalmente
+    else renderNotFound();
+
+    injectStickyCTA();
+    bindGlobalSearch();
   }
 
   window.addEventListener("hashchange", route);

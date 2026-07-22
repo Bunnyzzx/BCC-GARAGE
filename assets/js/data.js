@@ -1,5 +1,5 @@
 /* =========================================================
-   BCC Garage — Camada de dados (MVP)
+   TuneSpec — Camada de dados (MVP)
    Dados mockados: marcas, veículos, upgrades, profissionais
    e comunidade. Em produção, isto vem da API.
    ========================================================= */
@@ -18,6 +18,9 @@ TS.brands = [
   { id: "hyundai",    name: "Hyundai",    country: "Coreia",   mono: "HY" },
   { id: "mitsubishi", name: "Mitsubishi", country: "Japão",    mono: "M"  },
   { id: "mercedes",   name: "Mercedes",   country: "Alemanha", mono: "MB" },
+  { id: "ford",       name: "Ford",       country: "EUA",      mono: "FD" },
+  { id: "renault",    name: "Renault",    country: "França",   mono: "R"  },
+  { id: "peugeot",    name: "Peugeot",    country: "França",   mono: "P"  },
 ];
 
 /* ---------- Veículos ----------
@@ -42,6 +45,10 @@ TS.models = {
     v("polo-gts", "Polo GTS", "2020–2024", "1.4 TSI", "150 cv", "25,5 kgfm", "8,4 s", "203 km/h", "Automático 6 marchas", "Dianteira", "1.244 kg", "11,6 km/l", "R$ 119.000", "turbo", 20),
     v("virtus-exclusive", "Virtus Exclusive", "2023–2025", "1.4 TSI (250 TSI)", "150 cv", "25,5 kgfm", "8,7 s", "202 km/h", "Automático 6 marchas", "Dianteira", "1.280 kg", "11,3 km/l", "R$ 131.000", "turbo", 210),
     v("nivus-highline", "Nivus Highline", "2021–2025", "1.0 TSI (200 TSI)", "128 cv", "20,4 kgfm", "10,0 s", "187 km/h", "Automático 6 marchas", "Dianteira", "1.199 kg", "12,4 km/l", "R$ 129.000", "turbo", 150),
+    v("gol-g4", "Gol G4", "2005–2014", "1.0 8V Total Flex", "76 cv", "9,9 kgfm", "13,2 s", "163 km/h", "Manual 5 marchas", "Dianteira", "985 kg", "13,5 km/l", "R$ 22.000", "aspirado", 355),
+    v("saveiro", "Saveiro", "2009–2021", "1.6 8V Total Flex", "104 cv", "15,1 kgfm", "11,5 s", "175 km/h", "Manual 5 marchas", "Dianteira", "1.190 kg", "11,8 km/l", "R$ 45.000", "aspirado", 20),
+    v("voyage", "Voyage", "2012–2023", "1.6 16V MSI Flex", "120 cv", "16,6 kgfm", "10,2 s", "180 km/h", "Manual 5 marchas", "Dianteira", "1.105 kg", "12,4 km/l", "R$ 38.000", "aspirado", 0),
+    v("parati", "Parati", "2000–2006", "2.0 8V", "115 cv", "17,5 kgfm", "11,0 s", "178 km/h", "Manual 5 marchas", "Dianteira", "1.180 kg", "10,2 km/l", "R$ 28.000", "aspirado", 210),
   ],
   honda: [
     v("civic-si-g9", "Civic Si (9ª ger.)", "2012–2015", "2.4 i-VTEC", "206 cv", "23,5 kgfm", "7,2 s", "220 km/h", "Manual 6 marchas", "Dianteira", "1.335 kg", "10,5 km/l", "R$ 112.000", "aspirado", 355),
@@ -49,6 +56,7 @@ TS.models = {
     v("civic-touring-g10", "Civic Touring (G10)", "2017–2021", "1.5 VTEC Turbo", "173 cv", "22,4 kgfm", "8,4 s", "210 km/h", "CVT", "Dianteira", "1.320 kg", "11,7 km/l", "R$ 129.000", "turbo", 210),
     v("city-touring", "City Touring", "2022–2025", "1.5 i-VTEC", "126 cv", "15,8 kgfm", "10,3 s", "195 km/h", "CVT", "Dianteira", "1.149 kg", "12,9 km/l", "R$ 121.000", "aspirado", 20),
     v("hr-v-touring", "HR-V Touring", "2023–2025", "1.5 Turbo", "177 cv", "24,5 kgfm", "8,5 s", "200 km/h", "CVT", "Dianteira", "1.410 kg", "11,1 km/l", "R$ 165.000", "turbo", 150),
+    v("fit", "Fit EX", "2014–2021", "1.5 16V i-VTEC", "116 cv", "15,3 kgfm", "10,1 s", "180 km/h", "CVT", "Dianteira", "1.155 kg", "12,7 km/l", "R$ 79.000", "aspirado", 355),
   ],
   audi: [
     v("a3-sedan", "A3 Sedan", "2014–2020", "1.4 TFSI", "150 cv", "25,5 kgfm", "8,2 s", "224 km/h", "S tronic 7 marchas", "Dianteira", "1.260 kg", "11,8 km/l", "R$ 109.000", "turbo", 210),
@@ -78,6 +86,12 @@ TS.models = {
     v("camaro-ss", "Camaro SS", "2016–2022", "6.2 V8 (LT1)", "461 cv", "63,6 kgfm", "4,3 s", "290 km/h", "Automático 10 marchas", "Traseira", "1.671 kg", "6,9 km/l", "R$ 419.000", "aspirado", 0),
     v("tracker-rs", "Tracker RS", "2023–2025", "1.2 Turbo", "133 cv", "21,4 kgfm", "9,7 s", "195 km/h", "Automático 6 marchas", "Dianteira", "1.295 kg", "12,0 km/l", "R$ 149.000", "turbo", 210),
     v("s10-high-country", "S10 High Country", "2021–2025", "2.8 Diesel Turbo", "200 cv", "51,0 kgfm", "10,7 s", "180 km/h", "Automático 6 marchas", "4x4", "2.130 kg", "9,4 km/l", "R$ 289.000", "turbo", 150),
+    v("chevette", "Chevette", "1973–1993", "1.6 8V (carburado)", "74 cv", "12,5 kgfm", "14,5 s", "155 km/h", "Manual 4 marchas", "Traseira", "930 kg", "9,0 km/l", "R$ 18.000", "aspirado", 0),
+    v("opala", "Opala 250 S", "1968–1992", "4.1 6 cilindros", "134 cv", "29,0 kgfm", "10,5 s", "175 km/h", "Manual 4 marchas", "Traseira", "1.320 kg", "6,0 km/l", "R$ 35.000", "aspirado", 210),
+    v("astra", "Astra Advantage", "1998–2011", "2.0 8V", "116 cv", "19,0 kgfm", "10,8 s", "184 km/h", "Manual 5 marchas", "Dianteira", "1.230 kg", "10,5 km/l", "R$ 28.000", "aspirado", 20),
+    v("corsa", "Corsa Hatch", "1994–2012", "1.0 8V Flex", "68 cv", "9,1 kgfm", "13,5 s", "160 km/h", "Manual 5 marchas", "Dianteira", "970 kg", "13,0 km/l", "R$ 15.000", "aspirado", 355),
+    v("vectra", "Vectra GSI", "1996–2011", "2.2 16V", "144 cv", "20,4 kgfm", "9,8 s", "205 km/h", "Manual 5 marchas", "Dianteira", "1.310 kg", "9,8 km/l", "R$ 32.000", "aspirado", 150),
+    v("omega", "Omega CD", "1992–1998", "4.1 6 cilindros", "173 cv", "32,5 kgfm", "9,5 s", "195 km/h", "Automático 4 marchas", "Traseira", "1.480 kg", "6,5 km/l", "R$ 42.000", "aspirado", 0),
   ],
   fiat: [
     v("pulse-abarth", "Pulse Abarth", "2023–2025", "1.3 Turbo 270", "185 cv", "27,5 kgfm", "7,6 s", "215 km/h", "Automático 6 marchas", "Dianteira", "1.335 kg", "11,0 km/l", "R$ 159.000", "turbo", 0),
@@ -85,6 +99,10 @@ TS.models = {
     v("toro-volcano", "Toro Volcano Diesel", "2022–2025", "2.0 Turbo Diesel", "170 cv", "38,0 kgfm", "10,5 s", "185 km/h", "Automático 9 marchas", "4x4", "1.877 kg", "10,9 km/l", "R$ 189.000", "turbo", 150),
     v("argo-trekking", "Argo Trekking", "2021–2025", "1.3 Firefly", "107 cv", "13,7 kgfm", "11,5 s", "180 km/h", "Manual 5 marchas", "Dianteira", "1.132 kg", "13,2 km/l", "R$ 84.000", "aspirado", 20),
     v("marea-turbo", "Marea Turbo", "1999–2003", "2.0 20V Turbo (5 cil.)", "182 cv", "27,0 kgfm", "7,9 s", "225 km/h", "Manual 5 marchas", "Dianteira", "1.360 kg", "8,9 km/l", "R$ 39.000", "turbo", 210),
+    v("uno", "Uno Mille Fire", "2004–2013", "1.0 8V Fire Flex", "73 cv", "9,3 kgfm", "13,8 s", "158 km/h", "Manual 5 marchas", "Dianteira", "895 kg", "13,8 km/l", "R$ 18.000", "aspirado", 355),
+    v("palio", "Palio 1.6 16V", "2004–2017", "1.6 16V", "115 cv", "15,6 kgfm", "10,9 s", "182 km/h", "Manual 5 marchas", "Dianteira", "1.045 kg", "11,9 km/l", "R$ 26.000", "aspirado", 0),
+    v("siena", "Siena", "2004–2016", "1.4 8V Fire Flex", "88 cv", "12,3 kgfm", "12,4 s", "168 km/h", "Manual 5 marchas", "Dianteira", "1.035 kg", "12,9 km/l", "R$ 24.000", "aspirado", 20),
+    v("punto", "Punto Essence", "2007–2017", "1.6 16V E.torQ", "122 cv", "16,1 kgfm", "9,9 s", "188 km/h", "Manual 5 marchas / Dualogic", "Dianteira", "1.145 kg", "11,5 km/l", "R$ 42.000", "aspirado", 210),
   ],
   hyundai: [
     v("hb20-turbo", "HB20 Platinum Plus 1.0T", "2023–2025", "1.0 TGDI Turbo", "120 cv", "17,5 kgfm", "9,8 s", "188 km/h", "Automático 6 marchas", "Dianteira", "1.096 kg", "13,0 km/l", "R$ 109.000", "turbo", 210),
@@ -99,6 +117,23 @@ TS.models = {
     v("a45-amg", "A 45 S AMG", "2020–2024", "2.0 Turbo (M139)", "421 cv", "51,0 kgfm", "3,9 s", "270 km/h", "DCT 8 marchas", "Integral (4MATIC+)", "1.560 kg", "8,9 km/l", "R$ 559.000", "turbo", 0),
     v("cla250", "CLA 250", "2020–2024", "2.0 Turbo", "224 cv", "35,7 kgfm", "6,3 s", "250 km/h", "DCT 7 marchas", "Dianteira", "1.480 kg", "10,3 km/l", "R$ 329.000", "turbo", 355),
     v("c63-amg", "C 63 S AMG", "2016–2021", "4.0 V8 Biturbo", "510 cv", "71,4 kgfm", "4,0 s", "290 km/h", "Automático 9 marchas", "Traseira", "1.745 kg", "7,2 km/l", "R$ 549.000", "turbo", 150),
+  ],
+  ford: [
+    v("escort-xr3", "Escort XR3", "1983–2002", "1.8 8V", "110 cv", "16,0 kgfm", "10,2 s", "185 km/h", "Manual 5 marchas", "Dianteira", "980 kg", "9,5 km/l", "R$ 25.000", "aspirado", 355),
+    v("fiesta", "Fiesta 1.6 16V", "2010–2019", "1.6 16V Flex", "120 cv", "15,4 kgfm", "10,4 s", "182 km/h", "Manual 5 marchas / PowerShift", "Dianteira", "1.115 kg", "12,1 km/l", "R$ 44.000", "aspirado", 20),
+    v("ka", "Ka SE", "2014–2021", "1.0 12V SoHC Flex", "85 cv", "10,2 kgfm", "12,3 s", "165 km/h", "Manual 5 marchas", "Dianteira", "998 kg", "13,9 km/l", "R$ 39.000", "aspirado", 210),
+    v("focus", "Focus Titanium", "2013–2019", "2.0 16V Duratec", "163 cv", "20,4 kgfm", "9,0 s", "205 km/h", "Automático 6 marchas (PowerShift)", "Dianteira", "1.345 kg", "10,3 km/l", "R$ 58.000", "aspirado", 150),
+  ],
+  renault: [
+    v("sandero-gt", "Sandero GT Line", "2019–2025", "1.6 16V Flex", "118 cv", "16,3 kgfm", "10,3 s", "180 km/h", "Manual 5 marchas / CVT", "Dianteira", "1.088 kg", "12,3 km/l", "R$ 68.000", "aspirado", 0),
+    v("logan", "Logan Iconic", "2021–2025", "1.6 16V Flex", "118 cv", "16,3 kgfm", "10,6 s", "178 km/h", "Manual 5 marchas", "Dianteira", "1.105 kg", "12,0 km/l", "R$ 65.000", "aspirado", 355),
+    v("duster", "Duster Iconic", "2023–2025", "2.0 16V Flex", "148 cv", "20,6 kgfm", "10,5 s", "180 km/h", "CVT", "Dianteira / 4x4", "1.320 kg", "9,8 km/l", "R$ 99.000", "aspirado", 20),
+    v("clio", "Clio RT", "1999–2010", "1.6 16V", "110 cv", "15,8 kgfm", "10,8 s", "185 km/h", "Manual 5 marchas", "Dianteira", "1.070 kg", "11,4 km/l", "R$ 22.000", "aspirado", 210),
+  ],
+  peugeot: [
+    v("206", "206 Quiksilver", "1999–2010", "1.6 16V", "110 cv", "15,5 kgfm", "10,3 s", "188 km/h", "Manual 5 marchas", "Dianteira", "1.040 kg", "11,7 km/l", "R$ 24.000", "aspirado", 150),
+    v("208", "208 Griffe", "2020–2025", "1.6 16V Flex", "118 cv", "16,3 kgfm", "10,0 s", "182 km/h", "Manual 6 marchas / Automático", "Dianteira", "1.155 kg", "12,6 km/l", "R$ 79.000", "aspirado", 0),
+    v("3008", "3008 Allure THP", "2021–2025", "1.6 THP Turbo", "165 cv", "24,5 kgfm", "8,9 s", "205 km/h", "Automático 6 marchas", "Dianteira", "1.415 kg", "10,9 km/l", "R$ 189.000", "turbo", 355),
   ],
 };
 
@@ -290,6 +325,14 @@ TS.getAestheticCategories = function (vehicle) {
         { icon: "gauge", name: "Manômetros digitais", desc: "Kit boost, AFR e temperatura com visual OEM+.", price: "R$ 1.350", compat: "Universal" },
       ],
     },
+    {
+      id: "som", name: "Som", icon: "speaker",
+      desc: "Multimídia e áudio",
+      products: [
+        { icon: "speaker", name: "Central multimídia com CarPlay/Android Auto", desc: "Tela touch com espelhamento sem fio e câmera de ré integrada.", price: "R$ 890", compat: "Universal com moldura específica" },
+        { icon: "speaker", name: "Kit alto-falantes coaxiais 6\"", desc: "Substituição de fábrica, ganho real de nitidez e grave.", price: "R$ 420", compat: "Universal com adaptador" },
+      ],
+    },
   ];
 };
 
@@ -367,10 +410,10 @@ TS.getSeedPosts = function (vehicle) {
            não existir, o card usa a foto de banco do modelo. */
 TS.garage = [
   {
-    owner: "Bryan", name: "fastblack_", slug: "fastblack", brandId: "fiat", modelId: "fastback-abarth",
+    owner: "Bryan", name: "bastblack_", slug: "bastblack", brandId: "fiat", modelId: "fastback-abarth",
     photo: "fastblack.webp", focus: "center 44%",
     specs: { year: "2022/2023", power: "≈220 cv (170 whp)", torque: "31,5 kgfm", accel: "8,0 s",
-             cityKml: "7 km/l", hwyKml: "15 km/l" },
+             consumption: "7 km/l cidade · 15 km/l rodovia (gasolina)" },
     oil: "0W30",
     mods: "Limited Edition Powered by Abarth · 170 whp na roda (piggyback +30 whp / +4 kgfm sobre os 185 cv e 27,5 kgfm de fábrica).",
     build: [
@@ -395,9 +438,7 @@ TS.garage = [
   {
     owner: "Caio", name: "shiden_lancer", slug: "shiden", brandId: "mitsubishi", modelId: "lancer-gt",
     photo: "lancer_shiden.webp", focus: "center 48%",
-    specs: { year: "2012", power: "≈180 cv", torque: "20,1 kgfm", accel: "8,6 s",
-             cityKml: "6–7 km/l", hwyKml: "10–12 km/l" },
-    mods: "Aspiração otimizada: coletor 4-2-1 dimensionado em inox, intake dimensionado e filtro K&N, com gerenciamento MultiRemapped (multimapas).",
+    specs: { year: "2012", power: "≈180 cv", torque: "20,1 kgfm", accel: "8,6 s" },
     build: [
       "Bodykit full em ABS",
       "Parachoque dianteiro Varis V2",
@@ -419,8 +460,7 @@ TS.garage = [
     owner: "Cauã", name: "e36.bl0odymary", slug: "bloodymary", brandId: "bmw", modelId: "325i-e36",
     photo: "bm_caua.PNG", focus: "center 55%",
     specs: { engine: "2.5 24V M50B25 (aspirado)", power: "182 hp (roda)", torque: "33 kgfm",
-             accel: "7,0 s", gearbox: "Getrag manual 5 marchas",
-             cityKml: "7–8 km/l", hwyKml: "10–11 km/l" },
+             accel: "7,0 s", gearbox: "Getrag manual 5 marchas" },
     oil: "5W40",
     build: [
       "Escapamento direto",
@@ -521,5 +561,167 @@ TS.imgFor = function (brandId, model) {
 TS.getBrand = (id) => TS.brands.find((b) => b.id === id);
 TS.getVehicle = (brandId, modelId) => (TS.models[brandId] || []).find((m) => m.id === modelId);
 TS.getPro = (id) => TS.professionals.find((p) => p.id === id);
+
+/* =========================================================
+   Produtos universais — não dependem de marca/modelo.
+   Usados na home (destaque) e no Top 10 de acessórios.
+   ========================================================= */
+TS.universalProducts = [
+  { id: "dashcam", name: "Câmera veicular (dashcam) Full HD", desc: "Grava a via em loop; essencial para sinistro e estacionamento.", icon: "gauge", price: "R$ 189", network: "mercadolivre", category: "electronics" },
+  { id: "obd2", name: "Scanner OBD2 Bluetooth", desc: "Lê códigos de falha e parâmetros do motor pelo celular.", icon: "ecu", price: "R$ 79", network: "mercadolivre", category: "tools" },
+  { id: "aspirador", name: "Aspirador automotivo portátil", desc: "12V, limpa bancos e carpete sem precisar de tomada.", icon: "seat", price: "R$ 99", network: "shopee", category: "cleaning" },
+  { id: "suporte-celular", name: "Suporte de celular veicular", desc: "Fixação em grade de ar-condicionado, compatível com a maioria dos aparelhos.", icon: "gauge", price: "R$ 39", network: "shopee", category: "accessories" },
+  { id: "calibrador", name: "Calibrador digital de pneus", desc: "Leitura precisa de pressão; evita desgaste irregular.", icon: "wheel", price: "R$ 45", network: "mercadolivre", category: "tools" },
+  { id: "carregador-veicular", name: "Carregador veicular USB-C 65W", desc: "Carrega notebook e celular ao mesmo tempo na tomada 12V.", icon: "ecu", price: "R$ 69", network: "mercadolivre", category: "electronics" },
+  { id: "cera-cristalizadora", name: "Cera cristalizadora automotiva", desc: "Proteção e brilho para a pintura, aplicação simples.", icon: "bodykit", price: "R$ 55", network: "shopee", category: "cleaning" },
+  { id: "kit-partida", name: "Carregador/kit de partida (jump starter)", desc: "Dá partida na bateria descarregada sem precisar de outro carro.", icon: "turbo", price: "R$ 249", network: "mercadolivre", category: "maintenance" },
+  { id: "pelicula-insulfilm", name: "Kit de insulfilm automotivo", desc: "Reduz calor e ofusca a visão externa dos vidros.", icon: "taillight", price: "R$ 129", network: "shopee", category: "accessories" },
+  { id: "organizador-porta-malas", name: "Organizador de porta-malas dobrável", desc: "Mantém ferramentas e compras no lugar durante o trajeto.", icon: "seat", price: "R$ 59", network: "mercadolivre", category: "accessories" },
+  { id: "camera-re", name: "Câmera de ré universal", desc: "Instalação simples na placa, visão noturna e linhas de guia.", icon: "camera", price: "R$ 65", network: "mercadolivre", category: "electronics" },
+  { id: "central-multimidia", name: "Central multimídia CarPlay/Android Auto", desc: "Tela touch universal com espelhamento sem fio.", icon: "speaker", price: "R$ 890", network: "shopee", category: "audio" },
+  { id: "kit-led-interno", name: "Kit LED interno e placa", desc: "Substitui as lâmpadas incandescentes de fábrica por LED branco.", icon: "headlight", price: "R$ 89", network: "shopee", category: "lighting" },
+];
+
+/* =========================================================
+   Guias — conteúdo editorial (seção Blog / SEO informacional)
+   ========================================================= */
+TS.articles = [
+  {
+    slug: "stage-1-2-3-o-que-muda",
+    title: "Stage 1, 2 e 3: o que muda em cada estágio",
+    excerpt: "Entenda a diferença real entre os estágios de preparação antes de gastar seu dinheiro.",
+    cover: "ecu",
+    body:
+      "<p>Quando você pesquisa preparação de carro turbo, os termos <b>Stage 1, 2 e 3</b> aparecem o tempo todo — mas poucos lugares explicam o que muda de fato entre eles.</p>" +
+      "<p><b>Stage 1</b> é o ponto de entrada: remap (ou piggyback) somado a filtro de ar esportivo e, em muitos casos, downpipe. O motor continua de fábrica por dentro — o ganho vem de liberar o que o carro já tinha de sobra na calibração original. É o upgrade com melhor custo-benefício e menor risco de confiabilidade.</p>" +
+      "<p><b>Stage 2</b> já exige suporte: intercooler maior, embreagem reforçada (em manuais) ou tune de câmbio (em automáticos), e às vezes bico injetor maior. O motor está sendo empurrado mais perto do limite do que a fábrica projetou, então os componentes de suporte deixam de ser opcionais.</p>" +
+      "<p><b>Stage 3</b> normalmente envolve turbina maior, sistema de combustível revisado e, dependendo do carro, internos forjados. Aqui a conversa muda de \"upgrade\" para \"projeto\" — o carro deixa de ser confiável no dia a dia sem acompanhamento constante.</p>" +
+      "<p>Antes de decidir, pergunte: eu uso esse carro todo dia? Meu objetivo é rua, track day ou arrancada? A resposta define até onde vale a pena ir.</p>",
+    relatedCategories: ["ecu", "escape", "admissao"],
+  },
+  {
+    slug: "downpipe-vale-a-pena",
+    title: "Downpipe e escape esportivo: valem a pena?",
+    excerpt: "O upgrade mais comentado da cena turbo, explicado sem hype.",
+    cover: "exhaust",
+    body:
+      "<p>O downpipe é, depois do remap, a peça mais buscada por quem tem carro turbo. Mas o ganho real depende do resto do pacote.</p>" +
+      "<p>Sozinho, sem remap, um downpipe entrega principalmente <b>sonoridade</b> e uma leve redução de contrapressão — o ganho de potência é modesto. O ganho de verdade aparece quando o downpipe é somado a um remap calibrado para ele, porque a ECU passa a explorar a menor restrição de escape.</p>" +
+      "<p>Vale considerar também: em alguns estados, rodar sem catalisador pode gerar problema na inspeção veicular. Existem downpipes com catalisador esportivo (\"catted\") que preservam parte da eficiência de filtragem — vale pesquisar a legislação local antes de decidir entre catted e decat.</p>" +
+      "<p>Resumo prático: downpipe é upgrade de Stage 1/2, mas só entrega o potencial completo acompanhado de remap.</p>",
+    relatedCategories: ["escape", "ecu"],
+  },
+  {
+    slug: "primeiros-upgrades-carro-turbo",
+    title: "Primeiros upgrades para quem tem carro turbo de fábrica",
+    excerpt: "Por onde começar em Onix RS, HB20 Turbo, Polo GTS e outros populares turbo.",
+    cover: "turbo",
+    body:
+      "<p>Se o seu carro já sai de fábrica com motor turbo (Onix RS, HB20 1.0 Turbo, Polo GTS, Tracker RS, entre outros), o caminho de preparação costuma seguir uma ordem parecida.</p>" +
+      "<p><b>1. Filtro de ar esportivo</b> — barato, reversível, e melhora levemente a resposta.</p>" +
+      "<p><b>2. Piggyback ou remap</b> — é aqui que está o maior ganho percentual nesses motores pequenos e turbo. É também o item que mais separa um Stage 1 bem feito de um mal feito: procure quem já trabalhou com o seu motor especificamente.</p>" +
+      "<p><b>3. Escape esportivo / downpipe</b> — sonoridade e uma pequena liberação de fluxo.</p>" +
+      "<p>Nesses motores 1.0–1.4 turbo, não espere ganhos de 40–50% como em motores maiores — o ganho típico de Stage 1 fica entre 15% e 25%. Ainda assim, é uma transformação perceptível na resposta do carro no dia a dia.</p>",
+    relatedCategories: ["admissao", "ecu", "escape"],
+  },
+  {
+    slug: "aspirado-vs-turbo-para-preparar",
+    title: "Aspirado vs turbo: qual é melhor para preparar?",
+    excerpt: "Cada caminho tem uma lógica de preparação diferente — veja qual combina com seu objetivo.",
+    cover: "cam",
+    body:
+      "<p>Motor aspirado e motor turbo pedem abordagens de preparação bem diferentes, e entender isso evita comprar peça errada.</p>" +
+      "<p><b>No turbo</b>, o ganho mais barato e mais rápido vem de calibração (remap/piggyback) — você está liberando pressão de turbo que a fábrica deixou de fora por margem de segurança. Depois vêm downpipe, intercooler e, em estágios avançados, turbina maior.</p>" +
+      "<p><b>No aspirado</b>, não existe essa margem escondida — o motor já respira o que consegue. O caminho é físico: admissão de fluxo livre, coletor de escape (header) e catback, e, em estágios avançados, trabalho de cabeçote, comando de válvulas e, às vezes, ITBs (borboletas individuais). O ganho é mais gradual, mas costuma vir com uma resposta mais linear.</p>" +
+      "<p>Se o seu objetivo é ganho rápido e mensurável, turbo tem vantagem. Se é sonoridade, resposta em alta rotação e um projeto de longo prazo, aspirado tem seu charme — e uma cena própria (veja o Civic Si e o Lancer GT como exemplos).</p>",
+    relatedCategories: ["admissao", "escape"],
+  },
+  {
+    slug: "melhores-modificacoes-gol-g4",
+    title: "Melhores modificações para o Gol G4",
+    excerpt: "O hatch mais popular do Brasil também é o mais fácil de encontrar peça — veja por onde começar.",
+    cover: "wheel",
+    body:
+      "<p>O Gol G4 (2005–2014) é, provavelmente, o carro com a maior oferta de peças de reposição e customização do Brasil. Isso é uma vantagem real: qualquer upgrade que você procurar, vai encontrar em várias marcas e faixas de preço.</p>" +
+      "<p><b>Estética:</b> rodas aro 15–17 (a plataforma aceita bem sem alargamento), molas esportivas para reduzir 30–40 mm, faróis de LED plug-and-play e insulfilm são os quatro upgrades mais comuns e com melhor retorno visual pelo preço.</p>" +
+      "<p><b>Som e conforto:</b> como o G4 é anterior à era da central multimídia de fábrica, trocar por uma central com CarPlay/Android Auto costuma ser o upgrade que mais muda o dia a dia — moldura específica para o modelo é barata e a instalação é simples.</p>" +
+      "<p><b>Mecânica:</b> nos motores 1.0/1.6 aspirados, o ganho de performance vem de admissão, escape esportivo e, em alguns casos, retífica com comando mais esportivo — não espere milagres de potência num aspirado pequeno, mas a resposta melhora perceptivelmente.</p>" +
+      "<p>Antes de comprar peça, confirme o ano exato e o motor (1.0 8V, 1.0 16V ou 1.6) — o G4 teve várias motorizações e nem toda peça serve para todas.</p>",
+    relatedCategories: ["rodas", "suspensao", "som"],
+  },
+  {
+    slug: "como-montar-astra-turbo",
+    title: "Como montar um Astra Turbo (projeto de conversão)",
+    excerpt: "O Astra nunca saiu turbo de fábrica no Brasil — isso é um projeto de conversão, não uma peça de prateleira. Entenda o que está envolvido.",
+    cover: "turbo",
+    body:
+      "<p>Importante começar com uma diferença fundamental: transformar um Astra 2.0 8V aspirado em turbo <b>não é</b> comprar uma peça e instalar — é um projeto de conversão que envolve motor, gerenciamento e, quase sempre, acompanhamento de um preparador especializado em standalone.</p>" +
+      "<p><b>O que o projeto normalmente envolve:</b> coletor de escape específico para turbo, turbina dimensionada para o motor e o objetivo de potência, intercooler, sistema de combustível revisado (bico maior, bomba de alta), e uma <b>ECU standalone</b> (tipo FuelTech) — porque a injeção original não foi projetada para gerenciar pressão de turbo.</p>" +
+      "<p><b>Por que não é um upgrade de fim de semana:</b> sem mapa calibrado corretamente, motor aspirado convertido para turbo pode detonar (a temperatura e pressão internas sobem muito além do que os internos de fábrica foram projetados para aguentar). Internos forjados (pistão e biela) costumam entrar na conversa se o objetivo de potência for além de um ganho moderado.</p>" +
+      "<p><b>Recomendação honesta:</b> se você está pesquisando isso, o primeiro passo não é comprar peça — é conversar com um preparador que já fez conversão nesse motor especificamente, e definir orçamento e objetivo de potência antes de comprar qualquer componente.</p>",
+    relatedCategories: ["turbo", "standalone", "ecu"],
+  },
+  {
+    slug: "melhores-scanners-obd2",
+    title: "Melhores scanners OBD2 para diagnosticar seu carro",
+    excerpt: "Um scanner de R$ 80 já resolve 90% das dúvidas de \"por que a luz da injeção acendeu\".",
+    cover: "ecu",
+    body:
+      "<p>Desde 1996 (e no Brasil, obrigatório em todo carro novo desde 2010 aproximadamente), praticamente todo carro tem uma porta OBD2 — geralmente embaixo do painel, perto do volante. Um scanner Bluetooth de baixo custo, com um app no celular, já resolve a maior parte das dúvidas do dia a dia.</p>" +
+      "<p><b>O que um scanner básico faz:</b> lê o código de erro que acendeu a luz de injeção (\"check engine\"), mostra parâmetros em tempo real (rotação, temperatura, tensão da bateria, leitura de sonda lambda) e, em alguns casos, permite apagar o código depois do reparo.</p>" +
+      "<p><b>O que ele não faz:</b> não substitui diagnóstico de oficina para problemas complexos, e não faz programação de módulo (isso exige scanner de concessionária ou equipamento profissional).</p>" +
+      "<p>Para o uso comum — entender por que a luz acendeu antes de ir à oficina, ou acompanhar parâmetros depois de um upgrade — um scanner Bluetooth genérico resolve bem e custa uma fração de uma consulta de diagnóstico.</p>",
+    relatedCategories: ["ecu"],
+  },
+];
+
+/* =========================================================
+   Top 10 — listas curadas (SEO comercial de alta intenção)
+   ========================================================= */
+TS.topLists = [
+  {
+    slug: "acessorios-universais",
+    title: "Top 10 acessórios universais para qualquer carro",
+    intro: "Itens que servem para praticamente qualquer veículo — não precisa saber marca e modelo para comprar.",
+    items: TS.universalProducts,
+  },
+  {
+    slug: "upgrades-stage-1-mais-procurados",
+    title: "Top 10 upgrades de Stage 1 mais procurados",
+    intro: "O que a maioria dos donos de carro turbo compra primeiro, na ordem em que costuma valer a pena.",
+    items: [
+      { id: "s1-filtro", name: "Filtro de ar esportivo", desc: "Primeiro upgrade, barato e reversível.", icon: "filter", price: "R$ 180", network: "mercadolivre", category: "performance" },
+      { id: "s1-piggyback", name: "Módulo piggyback", desc: "Maior ganho percentual em motores pequenos turbo.", icon: "ecu", price: "R$ 950", network: "mercadolivre", category: "performance" },
+      { id: "s1-downpipe", name: "Downpipe esportivo", desc: "Sonoridade e liberação de fluxo, melhor com remap.", icon: "exhaust", price: "R$ 1.400", network: "mercadolivre", category: "performance" },
+      { id: "s1-ponteira", name: "Ponteira esportiva", desc: "Upgrade estético e sonoro de entrada.", icon: "exhaust", price: "R$ 320", network: "shopee", category: "performance" },
+      { id: "s1-molas", name: "Molas esportivas", desc: "Reduz altura e melhora handling sem trocar amortecedor.", icon: "coilover", price: "R$ 650", network: "mercadolivre", category: "performance" },
+      { id: "s1-rodas", name: "Jogo de rodas esportivas", desc: "Visual e, com pneu certo, ganho de handling.", icon: "wheel", price: "R$ 2.200", network: "mercadolivre", category: "tires" },
+      { id: "s1-manometro", name: "Manômetro de pressão (boost)", desc: "Acompanha a pressão do turbo em tempo real.", icon: "gauge", price: "R$ 210", network: "shopee", category: "performance" },
+      { id: "s1-intercooler", name: "Intercooler frontal (FMIC)", desc: "Reduz temperatura do ar de admissão em uso intenso.", icon: "turbo", price: "R$ 1.800", network: "mercadolivre", category: "performance" },
+      { id: "s1-farol-led", name: "Kit de faróis LED", desc: "Upgrade estético e de visibilidade noturna.", icon: "headlight", price: "R$ 380", network: "shopee", category: "lighting" },
+      { id: "s1-pedaleira", name: "Kit de pedaleiras esportivas", desc: "Acabamento de cockpit, instalação simples.", icon: "seat", price: "R$ 140", network: "mercadolivre", category: "interior" },
+    ],
+  },
+];
+
+/* =========================================================
+   Catálogo de produtos (/products) — taxonomia de categoria
+   ========================================================= */
+TS.productCategories = [
+  { id: "cleaning", name: "Limpeza" },
+  { id: "performance", name: "Performance" },
+  { id: "maintenance", name: "Manutenção" },
+  { id: "tools", name: "Ferramentas" },
+  { id: "lighting", name: "Iluminação" },
+  { id: "tires", name: "Pneus" },
+  { id: "interior", name: "Interior" },
+  { id: "audio", name: "Áudio" },
+  { id: "electronics", name: "Eletrônicos" },
+  { id: "accessories", name: "Acessórios" },
+];
+
+TS.productsCatalog = TS.universalProducts.concat(
+  TS.topLists.find((l) => l.slug === "upgrades-stage-1-mais-procurados").items
+);
 
 window.TS = TS;
