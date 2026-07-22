@@ -313,8 +313,8 @@
       })
       .join("");
 
-    const bestSellers = TS.productsCatalog.slice(0, 5);
-    const topDeals = TS.productsCatalog.slice(5, 10);
+    const bestSellers = TS.productsCatalog.slice(0, 8);
+    const topDeals = TS.productsCatalog.slice(8, 16);
 
     app.innerHTML =
       navbar("home") +
@@ -347,7 +347,7 @@
       '<div class="section-head"><div><div class="kicker">Populares</div>' +
       "<h2>Mais vendidos</h2><p>Os itens que mais saem entre os nossos parceiros.</p></div>" +
       '<a class="btn btn-ghost btn-sm" href="#/products">Ver todos</a></div>' +
-      '<div class="mp-grid">' + bestSellers.map((p) => productCard(p)).join("") + "</div>" +
+      productCarousel("carousel-best", bestSellers) +
       "</div></section>" +
 
       /* ---------- Ofertas em destaque ---------- */
@@ -355,7 +355,7 @@
       '<div class="section-head"><div><div class="kicker">Selecionados</div>' +
       "<h2>Ofertas em destaque</h2><p>Uma seleção diferente, direto dos nossos parceiros.</p></div>" +
       '<a class="btn btn-ghost btn-sm" href="#/products">Ver todos</a></div>' +
-      '<div class="mp-grid">' + topDeals.map((p) => productCard(p)).join("") + "</div>" +
+      productCarousel("carousel-deals", topDeals) +
       "</div></section>" +
 
       '<section class="section"><div class="container">' +
@@ -376,6 +376,53 @@
       footer();
 
     bindGlobalSearch("home-search", "home-search-dropdown");
+    bindCarousel("carousel-best");
+    bindCarousel("carousel-deals");
+  }
+
+  /* ---------- Carrossel de ofertas (auto-scroll · prev/next · swipe · loop) ---------- */
+  const CHEV_L = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>';
+  const CHEV_R = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
+  const carouselTimer = {};
+
+  function productCarousel(id, items) {
+    return (
+      '<div class="carousel">' +
+      '<button class="carousel-btn carousel-btn--prev" data-track="' + id + '" data-dir="-1" aria-label="Anterior">' + CHEV_L + "</button>" +
+      '<div class="carousel-track" id="' + id + '">' +
+      items.map((p) => '<div class="carousel-item">' + productCard(p) + "</div>").join("") +
+      "</div>" +
+      '<button class="carousel-btn carousel-btn--next" data-track="' + id + '" data-dir="1" aria-label="Próximo">' + CHEV_R + "</button>" +
+      "</div>"
+    );
+  }
+
+  function bindCarousel(id) {
+    const track = document.getElementById(id);
+    if (!track) return;
+    const wrap = track.closest(".carousel");
+    const step = () => {
+      const item = track.querySelector(".carousel-item");
+      return item ? item.getBoundingClientRect().width + 16 : 280;
+    };
+    function go(dir) {
+      const max = track.scrollWidth - track.clientWidth;
+      if (max <= 2) return;
+      if (dir > 0 && track.scrollLeft >= max - 4) track.scrollTo({ left: 0, behavior: "smooth" });
+      else if (dir < 0 && track.scrollLeft <= 4) track.scrollTo({ left: max, behavior: "smooth" });
+      else track.scrollBy({ left: dir * step(), behavior: "smooth" });
+    }
+    wrap.querySelectorAll(".carousel-btn").forEach((b) =>
+      b.addEventListener("click", () => go(parseInt(b.dataset.dir, 10)))
+    );
+    if (carouselTimer[id]) clearInterval(carouselTimer[id]);
+    carouselTimer[id] = setInterval(() => go(1), 4200);
+    const pause = () => { clearInterval(carouselTimer[id]); carouselTimer[id] = null; };
+    const resume = () => { if (!carouselTimer[id]) carouselTimer[id] = setInterval(() => go(1), 4200); };
+    wrap.addEventListener("mouseenter", pause);
+    wrap.addEventListener("mouseleave", resume);
+    track.addEventListener("touchstart", pause, { passive: true });
+    track.addEventListener("touchend", () => setTimeout(resume, 3500), { passive: true });
   }
 
   /* =========================================================
